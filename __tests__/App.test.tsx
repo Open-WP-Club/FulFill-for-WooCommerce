@@ -1,0 +1,69 @@
+jest.mock('react-native-gesture-handler', () => ({
+  GestureHandlerRootView: ({children}: {children: React.ReactNode}) => children,
+}));
+
+jest.mock('react-native-safe-area-context', () => ({
+  SafeAreaProvider: ({children}: {children: React.ReactNode}) => children,
+  useSafeAreaInsets: () => ({top: 0, bottom: 0, left: 0, right: 0}),
+}));
+
+jest.mock('react-native-screens', () => ({
+  enableScreens: jest.fn(),
+}));
+
+jest.mock('react-native-mmkv', () => {
+  const store = new Map<string, string>();
+  return {
+    createMMKV: () => ({
+      getString: (key: string) => store.get(key),
+      set: (key: string, value: string | number | boolean) =>
+        store.set(key, String(value)),
+      remove: (key: string) => store.delete(key),
+      contains: (key: string) => store.has(key),
+      getAllKeys: () => Array.from(store.keys()),
+      clearAll: () => store.clear(),
+    }),
+  };
+});
+
+jest.mock('react-native-vector-icons/MaterialIcons', () => 'Icon');
+
+jest.mock('@react-native-community/netinfo', () => ({
+  addEventListener: jest.fn(() => jest.fn()),
+  fetch: jest.fn(() => Promise.resolve({isConnected: true})),
+}));
+
+jest.mock('react-native-vision-camera', () => ({
+  Camera: 'Camera',
+  useCameraDevice: jest.fn(() => ({id: 'back'})),
+  useCodeScanner: jest.fn(() => ({})),
+}));
+
+jest.mock('@react-navigation/native', () => ({
+  NavigationContainer: ({children}: {children: React.ReactNode}) => children,
+  useNavigation: () => ({navigate: jest.fn(), goBack: jest.fn()}),
+}));
+
+jest.mock('@react-navigation/native-stack', () => ({
+  createNativeStackNavigator: () => ({
+    Navigator: ({children}: {children: React.ReactNode}) => children,
+    Screen: () => null,
+  }),
+}));
+
+jest.mock('@react-navigation/bottom-tabs', () => ({
+  createBottomTabNavigator: () => ({
+    Navigator: ({children}: {children: React.ReactNode}) => children,
+    Screen: () => null,
+  }),
+}));
+
+import React from 'react';
+import ReactTestRenderer from 'react-test-renderer';
+import App from '../App';
+
+test('renders without crashing', async () => {
+  await ReactTestRenderer.act(() => {
+    ReactTestRenderer.create(<App />);
+  });
+});
