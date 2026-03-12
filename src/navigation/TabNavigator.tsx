@@ -3,6 +3,7 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {OrdersStackNavigator} from './OrdersStackNavigator';
 import {ScannerScreen} from '../screens/scanner/ScannerScreen';
+import {AnalyticsDashboardScreen} from '../screens/analytics/AnalyticsDashboardScreen';
 import {SettingsScreen} from '../screens/settings/SettingsScreen';
 import type {TabParamList} from '../types/navigation';
 
@@ -38,6 +39,18 @@ export function TabNavigator() {
           headerTintColor: '#fff',
           tabBarIcon: ({color, size}) => (
             <Icon name="qr-code-scanner" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="AnalyticsTab"
+        component={AnalyticsDashboardScreen}
+        options={{
+          title: 'Analytics',
+          headerStyle: {backgroundColor: '#4F46E5'},
+          headerTintColor: '#fff',
+          tabBarIcon: ({color, size}) => (
+            <Icon name="bar-chart" size={size} color={color} />
           ),
         }}
       />

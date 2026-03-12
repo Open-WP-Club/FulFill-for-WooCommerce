@@ -1,6 +1,8 @@
 import React from 'react';
 import {View, Text, Image, StyleSheet, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import {StockIndicator} from './StockIndicator';
+import {useProductStock} from '../../hooks/useProductStock';
 import type {PickItem} from '../../types/picking';
 
 interface PickItemRowProps {
@@ -18,6 +20,7 @@ const STATUS_ICONS: Record<string, {name: string; color: string}> = {
 
 export function PickItemRow({item, onMarkMissing, onMarkDamaged}: PickItemRowProps) {
   const icon = STATUS_ICONS[item.status];
+  const {stockQuantity, stockStatus, isLoading} = useProductStock(item.productId);
 
   return (
     <View style={[styles.container, item.status === 'picked' && styles.picked]}>
@@ -35,6 +38,9 @@ export function PickItemRow({item, onMarkMissing, onMarkDamaged}: PickItemRowPro
         <Text style={styles.quantity}>
           {item.pickedQuantity} / {item.quantity}
         </Text>
+        {!isLoading && (
+          <StockIndicator stockQuantity={stockQuantity} stockStatus={stockStatus} />
+        )}
       </View>
       <View style={styles.actions}>
         <TouchableOpacity onPress={onMarkMissing} style={styles.actionBtn}>

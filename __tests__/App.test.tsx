@@ -58,6 +58,26 @@ jest.mock('@react-navigation/bottom-tabs', () => ({
   }),
 }));
 
+jest.mock('react-native-sound', () => {
+  class MockSound {
+    static setCategory = jest.fn();
+    play = jest.fn();
+    stop = jest.fn(cb => cb && cb());
+    release = jest.fn();
+  }
+  return MockSound;
+});
+
+jest.mock('@notifee/react-native', () => ({
+  __esModule: true,
+  default: {
+    requestPermission: jest.fn(() => Promise.resolve()),
+    createChannel: jest.fn(() => Promise.resolve()),
+    displayNotification: jest.fn(() => Promise.resolve()),
+  },
+  AndroidImportance: {HIGH: 4},
+}));
+
 import React from 'react';
 import ReactTestRenderer from 'react-test-renderer';
 import App from '../App';

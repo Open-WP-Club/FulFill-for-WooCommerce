@@ -27,6 +27,12 @@ export function LoginScreen() {
       return;
     }
 
+    const urlPattern = /^https?:\/\/.+\..+/;
+    if (!urlPattern.test(siteUrl.trim())) {
+      Alert.alert('Error', 'Please enter a valid URL (e.g. https://yourstore.com)');
+      return;
+    }
+
     setLoading(true);
     try {
       // Temporarily set credentials to test

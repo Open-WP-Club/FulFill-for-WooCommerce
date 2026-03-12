@@ -2,6 +2,11 @@ import type {WcLineItem} from '../types/order';
 import type {WcProduct} from '../types/product';
 
 const BARCODE_META_KEYS = ['_barcode', '_ean', '_gtin', '_upc'];
+const TOTE_BARCODE_PREFIX = 'TOTE-';
+
+export function isToteBarcode(barcode: string): boolean {
+  return barcode.toUpperCase().startsWith(TOTE_BARCODE_PREFIX);
+}
 
 export function matchBarcodeToLineItem(
   barcode: string,

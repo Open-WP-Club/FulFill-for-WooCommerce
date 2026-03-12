@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7B2FF7"/>
+      <stop offset="100%" style="stop-color:#4F46E5"/>
+    </linearGradient>
+  </defs>
+  <!-- Rounded square background -->
+  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+  <!-- Box/package shape -->
+  <g transform="translate(256,240)">
+    <!-- Box body -->
+    <path d="M-120,10 L-120,100 Q-120,115 -105,115 L105,115 Q120,115 120,100 L120,10 Z" fill="rgba(255,255,255,0.2)"/>
+    <!-- Box lid -->
+    <path d="M-135,-10 L0,-60 L135,-10 L0,20 Z" fill="rgba(255,255,255,0.95)"/>
+    <path d="M0,20 L0,-60" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>
+    <path d="M-135,-10 L0,20 L135,-10" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+    <!-- Box front -->
+    <path d="M-135,-10 L-120,10 L0,40 L120,10 L135,-10 L0,20 Z" fill="rgba(255,255,255,0.35)"/>
+  </g>
+  <!-- Checkmark circle -->
+  <circle cx="370" cy="150" r="70" fill="#10B981"/>
+  <circle cx="370" cy="150" r="62" fill="none" stroke="white" stroke-width="4"/>
+  <polyline points="340,150 360,170 400,130" fill="none" stroke="white" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Text -->
+  <text x="256" y="430" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-weight="800" font-size="64" fill="white" letter-spacing="-1">FulFill</text>
+</svg>

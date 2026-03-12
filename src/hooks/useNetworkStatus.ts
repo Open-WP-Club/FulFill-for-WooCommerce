@@ -8,6 +8,12 @@ export function useNetworkStatus() {
   const processQueue = useSyncStore(s => s.processQueue);
   const autoSyncEnabled = useSettingsStore(s => s.autoSyncEnabled);
 
+  useEffect(() => {
+    NetInfo.fetch().then(state => {
+      setIsConnected(state.isConnected ?? false);
+    });
+  }, []);
+
   const handleConnectivityChange = useCallback(
     (connected: boolean) => {
       const wasOffline = !isConnected;

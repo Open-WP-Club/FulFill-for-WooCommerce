@@ -1,7 +1,8 @@
 export type MutationType =
   | 'UPDATE_ORDER_STATUS'
   | 'ADD_ORDER_NOTE'
-  | 'UPDATE_TRACKING';
+  | 'UPDATE_TRACKING'
+  | 'UPDATE_STOCK';
 
 export interface QueuedMutation {
   id: string;

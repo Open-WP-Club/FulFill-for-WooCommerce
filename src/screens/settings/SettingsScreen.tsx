@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Text, StyleSheet, Switch, ScrollView, Alert} from 'react-native';
+import {View, Text, StyleSheet, Switch, ScrollView, Alert, TouchableOpacity} from 'react-native';
 import {Card} from '../../components/common/Card';
 import {Button} from '../../components/common/Button';
 import {useAuthStore} from '../../stores/authStore';
@@ -14,9 +14,13 @@ export function SettingsScreen() {
     soundEnabled,
     hapticEnabled,
     autoSyncEnabled,
+    notificationsEnabled,
+    lowStockThreshold,
     setSoundEnabled,
     setHapticEnabled,
     setAutoSyncEnabled,
+    setNotificationsEnabled,
+    setLowStockThreshold,
   } = useSettingsStore();
   const clearQueue = useSyncStore(s => s.clearQueue);
   const {pendingCount, isSyncing, lastSyncAt, isConnected} = useSync();
@@ -73,6 +77,41 @@ export function SettingsScreen() {
         <View style={styles.switchRow}>
           <Text style={styles.label}>Auto sync</Text>
           <Switch value={autoSyncEnabled} onValueChange={setAutoSyncEnabled} />
+        </View>
+      </Card>
+
+      {/* Notifications */}
+      <Card>
+        <Text style={styles.sectionTitle}>Notifications</Text>
+        <View style={styles.switchRow}>
+          <Text style={styles.label}>New order alerts</Text>
+          <Switch
+            value={notificationsEnabled}
+            onValueChange={setNotificationsEnabled}
+          />
+        </View>
+      </Card>
+
+      {/* Inventory */}
+      <Card>
+        <Text style={styles.sectionTitle}>Inventory</Text>
+        <View style={styles.row}>
+          <Text style={styles.label}>Low stock threshold</Text>
+          <View style={styles.stepper}>
+            <TouchableOpacity
+              onPress={() =>
+                setLowStockThreshold(Math.max(1, lowStockThreshold - 1))
+              }
+              style={styles.stepperBtn}>
+              <Text style={styles.stepperBtnText}>-</Text>
+            </TouchableOpacity>
+            <Text style={styles.stepperValue}>{lowStockThreshold}</Text>
+            <TouchableOpacity
+              onPress={() => setLowStockThreshold(lowStockThreshold + 1)}
+              style={styles.stepperBtn}>
+              <Text style={styles.stepperBtnText}>+</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </Card>
 
@@ -169,6 +208,31 @@ const styles = StyleSheet.create({
   },
   clearBtn: {
     marginTop: 12,
+  },
+  stepper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  stepperBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: '#F3F4F6',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  stepperBtnText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#374151',
+  },
+  stepperValue: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#111827',
+    minWidth: 24,
+    textAlign: 'center',
   },
   logoutContainer: {
     padding: 16,

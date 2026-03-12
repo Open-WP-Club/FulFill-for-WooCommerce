@@ -21,15 +21,23 @@ jest.mock('../../src/api/notes', () => ({
   addOrderNote: jest.fn(),
 }));
 
+jest.mock('../../src/api/inventory', () => ({
+  updateProductStock: jest.fn(),
+}));
+
 import {useSyncStore} from '../../src/stores/syncStore';
 import {updateOrderStatus} from '../../src/api/orders';
 import {addOrderNote} from '../../src/api/notes';
+import {updateProductStock} from '../../src/api/inventory';
 
 const mockUpdateOrderStatus = updateOrderStatus as jest.MockedFunction<
   typeof updateOrderStatus
 >;
 const mockAddOrderNote = addOrderNote as jest.MockedFunction<
   typeof addOrderNote
+>;
+const mockUpdateProductStock = updateProductStock as jest.MockedFunction<
+  typeof updateProductStock
 >;
 
 describe('syncStore', () => {
@@ -175,6 +183,20 @@ describe('syncStore', () => {
       expect(mockUpdateOrderStatus).not.toHaveBeenCalled();
       // Reset for cleanup
       useSyncStore.setState({isSyncing: false});
+    });
+
+    it('processes UPDATE_STOCK mutations', async () => {
+      mockUpdateProductStock.mockResolvedValueOnce({} as any);
+
+      useSyncStore.getState().enqueue('UPDATE_STOCK', {
+        productId: 50,
+        quantity: 10,
+      });
+
+      await useSyncStore.getState().processQueue();
+
+      expect(mockUpdateProductStock).toHaveBeenCalledWith(50, 10);
+      expect(useSyncStore.getState().queue).toHaveLength(0);
     });
 
     it('does nothing with empty queue', async () => {

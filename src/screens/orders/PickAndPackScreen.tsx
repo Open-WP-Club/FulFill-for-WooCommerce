@@ -10,9 +10,12 @@ import {Button} from '../../components/common/Button';
 import {usePickingStore} from '../../stores/pickingStore';
 import {useOrderDetail} from '../../hooks/useOrderDetail';
 import {useBarcodeScanner} from '../../hooks/useBarcodeScanner';
-import {matchBarcodeToLineItem} from '../../utils/barcode';
-import {vibrateSuccess, vibrateError} from '../../utils/notifications';
-import {useSettingsStore} from '../../stores/settingsStore';
+import {matchBarcodeToLineItem, isToteBarcode} from '../../utils/barcode';
+import {playSuccessFeedback, playErrorFeedback} from '../../utils/feedback';
+import {useToteStore} from '../../stores/toteStore';
+import {useAnalyticsStore} from '../../stores/analyticsStore';
+import {ToteBadge} from '../../components/picking/ToteBadge';
+import {ToteScanModal} from '../../components/picking/ToteScanModal';
 import type {OrdersStackParamList} from '../../types/navigation';
 import type {PickItem} from '../../types/picking';
 
@@ -29,8 +32,13 @@ export function PickAndPackScreen({route, navigation}: Props) {
     updateItemStatus,
     isSessionComplete,
   } = usePickingStore();
-  const hapticEnabled = useSettingsStore(s => s.hapticEnabled);
 
+  const toteAssignment = useToteStore(s => s.assignments[order.id]);
+  const assignTote = useToteStore(s => s.assignTote);
+  const clearAssignment = useToteStore(s => s.clearAssignment);
+  const recordSession = useAnalyticsStore(s => s.recordSession);
+
+  const [toteScanVisible, setToteScanVisible] = useState(false);
   const [scanResult, setScanResult] = useState<{
     visible: boolean;
     success: boolean;
@@ -52,21 +60,29 @@ export function PickAndPackScreen({route, navigation}: Props) {
         return;
       }
 
+      // Check if it's a tote barcode
+      if (isToteBarcode(barcode)) {
+        assignTote(order.id, order.number, barcode);
+        playSuccessFeedback();
+        setScanResult({
+          visible: true,
+          success: true,
+          message: `Tote assigned: ${barcode}`,
+        });
+        return;
+      }
+
       const matched = matchBarcodeToLineItem(barcode, order.line_items);
       if (matched) {
         incrementPicked(matched.id);
-        if (hapticEnabled) {
-          vibrateSuccess();
-        }
+        playSuccessFeedback();
         setScanResult({
           visible: true,
           success: true,
           message: `Picked: ${matched.name}`,
         });
       } else {
-        if (hapticEnabled) {
-          vibrateError();
-        }
+        playErrorFeedback();
         setScanResult({
           visible: true,
           success: false,
@@ -74,12 +90,38 @@ export function PickAndPackScreen({route, navigation}: Props) {
         });
       }
     },
-    [activeSession, order.line_items, incrementPicked, hapticEnabled],
+    [activeSession, order.line_items, order.id, order.number, incrementPicked, assignTote],
   );
 
   const {isActive, handleCodeScanned} = useBarcodeScanner({
     onScan: handleScan,
   });
+
+  const finishOrder = useCallback(() => {
+    if (activeSession) {
+      const now = new Date().toISOString();
+      const startMs = new Date(activeSession.startedAt).getTime();
+      const durationMs = Date.now() - startMs;
+      recordSession({
+        sessionId: `${order.id}-${startMs}`,
+        orderId: order.id,
+        orderNumber: order.number,
+        startedAt: activeSession.startedAt,
+        completedAt: now,
+        totalItems: activeSession.items.reduce((sum, i) => sum + i.quantity, 0),
+        pickedCorrectly: activeSession.items
+          .filter(i => i.status === 'picked')
+          .reduce((sum, i) => sum + i.pickedQuantity, 0),
+        markedMissing: activeSession.items.filter(i => i.status === 'missing').length,
+        markedDamaged: activeSession.items.filter(i => i.status === 'damaged').length,
+        durationMs,
+      });
+    }
+    changeStatus('completed');
+    endSession();
+    clearAssignment(order.id);
+    navigation.goBack();
+  }, [activeSession, order, changeStatus, endSession, clearAssignment, recordSession, navigation]);
 
   const handleComplete = useCallback(() => {
     if (!isSessionComplete()) {
@@ -88,22 +130,13 @@ export function PickAndPackScreen({route, navigation}: Props) {
         'Not all items have been picked. Complete anyway?',
         [
           {text: 'Cancel', style: 'cancel'},
-          {
-            text: 'Complete',
-            onPress: () => {
-              changeStatus('completed');
-              endSession();
-              navigation.goBack();
-            },
-          },
+          {text: 'Complete', onPress: finishOrder},
         ],
       );
     } else {
-      changeStatus('completed');
-      endSession();
-      navigation.goBack();
+      finishOrder();
     }
-  }, [isSessionComplete, changeStatus, endSession, navigation]);
+  }, [isSessionComplete, finishOrder]);
 
   const renderItem = useCallback(
     ({item}: {item: PickItem}) => (
@@ -140,6 +173,21 @@ export function PickAndPackScreen({route, navigation}: Props) {
       />
 
       <PickProgressBar items={activeSession.items} />
+
+      <ToteBadge
+        toteBarcode={toteAssignment?.toteBarcode ?? null}
+        isVerified={!!toteAssignment?.verifiedAt}
+        onScanTote={() => setToteScanVisible(true)}
+      />
+
+      <ToteScanModal
+        visible={toteScanVisible}
+        onClose={() => setToteScanVisible(false)}
+        onScanned={barcode => {
+          assignTote(order.id, order.number, barcode);
+          setToteScanVisible(false);
+        }}
+      />
 
       <FlatList
         data={activeSession.items}

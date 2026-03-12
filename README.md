@@ -1,6 +1,13 @@
-# FulFill for WooCommerce
+<p align="center">
+  <img src="assets/logos/logo-b-warehouse.svg" width="128" height="128" alt="FulFill logo" />
+</p>
 
-React Native mobile app for warehouse order fulfillment with WooCommerce. Allows warehouse staff to browse orders, scan barcodes to verify products, manage pick & pack workflows, and work offline with automatic sync.
+<h1 align="center">FulFill for WooCommerce</h1>
+
+<p align="center">
+  React Native mobile app for warehouse order fulfillment with WooCommerce.<br/>
+  Allows warehouse staff to browse orders, scan barcodes to verify products, manage pick & pack workflows, and work offline with automatic sync.
+</p>
 
 ## Features
 
@@ -66,6 +73,17 @@ npx react-native run-android
 1. In your WooCommerce store, go to **Settings > Advanced > REST API**
 2. Create API keys with Read/Write permissions
 3. Open the app and enter your store URL, consumer key, and consumer secret
+
+## Building a Release
+
+Push a git tag to trigger the GitHub Actions build:
+
+```bash
+git tag 1.0.0
+git push --tags
+```
+
+This will build a release APK and create a GitHub Release with the artifact attached.
 
 ## Testing
 

@@ -7,11 +7,15 @@ interface SettingsState {
   hapticEnabled: boolean;
   autoSyncEnabled: boolean;
   pollingIntervalMs: number;
+  notificationsEnabled: boolean;
+  lowStockThreshold: number;
 
   setSoundEnabled: (enabled: boolean) => void;
   setHapticEnabled: (enabled: boolean) => void;
   setAutoSyncEnabled: (enabled: boolean) => void;
   setPollingInterval: (ms: number) => void;
+  setNotificationsEnabled: (enabled: boolean) => void;
+  setLowStockThreshold: (n: number) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -21,11 +25,15 @@ export const useSettingsStore = create<SettingsState>()(
       hapticEnabled: true,
       autoSyncEnabled: true,
       pollingIntervalMs: 30000,
+      notificationsEnabled: true,
+      lowStockThreshold: 5,
 
       setSoundEnabled: enabled => set({soundEnabled: enabled}),
       setHapticEnabled: enabled => set({hapticEnabled: enabled}),
       setAutoSyncEnabled: enabled => set({autoSyncEnabled: enabled}),
       setPollingInterval: ms => set({pollingIntervalMs: ms}),
+      setNotificationsEnabled: enabled => set({notificationsEnabled: enabled}),
+      setLowStockThreshold: n => set({lowStockThreshold: n}),
     }),
     {
       name: 'settings-storage',

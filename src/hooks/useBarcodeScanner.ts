@@ -1,7 +1,7 @@
 import {useState, useCallback, useRef} from 'react';
 import type {Code} from 'react-native-vision-camera';
 
-interface UseBarcodeSccannerOptions {
+interface UseBarcodeScannerOptions {
   onScan: (barcode: string) => void;
   cooldownMs?: number;
 }
@@ -9,7 +9,7 @@ interface UseBarcodeSccannerOptions {
 export function useBarcodeScanner({
   onScan,
   cooldownMs = 1500,
-}: UseBarcodeSccannerOptions) {
+}: UseBarcodeScannerOptions) {
   const [isActive, setIsActive] = useState(true);
   const lastScannedRef = useRef<string | null>(null);
   const cooldownRef = useRef<ReturnType<typeof setTimeout> | null>(null);

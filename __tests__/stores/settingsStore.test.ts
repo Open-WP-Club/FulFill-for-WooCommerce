@@ -22,6 +22,8 @@ describe('settingsStore', () => {
     expect(state.hapticEnabled).toBe(true);
     expect(state.autoSyncEnabled).toBe(true);
     expect(state.pollingIntervalMs).toBe(30000);
+    expect(state.notificationsEnabled).toBe(true);
+    expect(state.lowStockThreshold).toBe(5);
   });
 
   it('toggles sound', () => {
@@ -44,5 +46,17 @@ describe('settingsStore', () => {
   it('sets polling interval', () => {
     useSettingsStore.getState().setPollingInterval(60000);
     expect(useSettingsStore.getState().pollingIntervalMs).toBe(60000);
+  });
+
+  it('toggles notifications', () => {
+    useSettingsStore.getState().setNotificationsEnabled(false);
+    expect(useSettingsStore.getState().notificationsEnabled).toBe(false);
+    useSettingsStore.getState().setNotificationsEnabled(true);
+    expect(useSettingsStore.getState().notificationsEnabled).toBe(true);
+  });
+
+  it('sets low stock threshold', () => {
+    useSettingsStore.getState().setLowStockThreshold(10);
+    expect(useSettingsStore.getState().lowStockThreshold).toBe(10);
   });
 });

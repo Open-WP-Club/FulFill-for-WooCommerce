@@ -6,6 +6,8 @@ import {Card} from '../../components/common/Card';
 import {Button} from '../../components/common/Button';
 import {useBarcodeScanner} from '../../hooks/useBarcodeScanner';
 import {fetchProductBySku} from '../../api/products';
+import {playSuccessFeedback, playErrorFeedback} from '../../utils/feedback';
+import {StockIndicator} from '../../components/picking/StockIndicator';
 import type {WcProduct} from '../../types/product';
 
 export function ScannerScreen() {
@@ -21,8 +23,14 @@ export function ScannerScreen() {
     try {
       const product = await fetchProductBySku(barcode);
       setScannedProduct(product);
+      if (product) {
+        playSuccessFeedback();
+      } else {
+        playErrorFeedback();
+      }
     } catch {
       setScannedProduct(null);
+      playErrorFeedback();
     } finally {
       setSearching(false);
     }
@@ -59,10 +67,10 @@ export function ScannerScreen() {
                 <Text style={styles.productPrice}>
                   Price: {scannedProduct.price}
                 </Text>
-                <Text style={styles.productStock}>
-                  Stock: {scannedProduct.stock_status} (
-                  {scannedProduct.stock_quantity ?? 'N/A'})
-                </Text>
+                <StockIndicator
+                  stockQuantity={scannedProduct.stock_quantity}
+                  stockStatus={scannedProduct.stock_status}
+                />
               </View>
             )}
 
@@ -130,11 +138,6 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   productPrice: {
-    fontSize: 14,
-    color: '#6B7280',
-    marginTop: 2,
-  },
-  productStock: {
     fontSize: 14,
     color: '#6B7280',
     marginTop: 2,

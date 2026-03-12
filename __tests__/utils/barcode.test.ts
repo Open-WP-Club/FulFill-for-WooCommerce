@@ -1,4 +1,4 @@
-import {matchBarcodeToLineItem, matchBarcodeToProduct} from '../../src/utils/barcode';
+import {matchBarcodeToLineItem, matchBarcodeToProduct, isToteBarcode} from '../../src/utils/barcode';
 import type {WcLineItem} from '../../src/types/order';
 import type {WcProduct} from '../../src/types/product';
 
@@ -161,5 +161,24 @@ describe('matchBarcodeToProduct', () => {
   it('returns null for empty products array', () => {
     const result = matchBarcodeToProduct('ABC', []);
     expect(result).toBeNull();
+  });
+});
+
+describe('isToteBarcode', () => {
+  it('returns true for TOTE- prefixed barcodes', () => {
+    expect(isToteBarcode('TOTE-A1')).toBe(true);
+    expect(isToteBarcode('TOTE-123')).toBe(true);
+  });
+
+  it('is case-insensitive', () => {
+    expect(isToteBarcode('tote-a1')).toBe(true);
+    expect(isToteBarcode('Tote-B2')).toBe(true);
+  });
+
+  it('returns false for non-tote barcodes', () => {
+    expect(isToteBarcode('SKU-001')).toBe(false);
+    expect(isToteBarcode('4006381333931')).toBe(false);
+    expect(isToteBarcode('TOTEM-123')).toBe(false);
+    expect(isToteBarcode('')).toBe(false);
   });
 });

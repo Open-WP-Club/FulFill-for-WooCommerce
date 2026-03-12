@@ -5,6 +5,7 @@ import {zustandMMKVStorage} from '../utils/storage';
 import type {QueuedMutation, MutationType} from '../types/sync';
 import {updateOrderStatus} from '../api/orders';
 import {addOrderNote} from '../api/notes';
+import {updateProductStock} from '../api/inventory';
 import type {WcOrderStatus} from '../types/order';
 
 interface SyncStoreState {
@@ -103,6 +104,12 @@ async function executeMutation(mutation: QueuedMutation): Promise<void> {
         mutation.payload.orderId as number,
         `Tracking: ${mutation.payload.trackingNumber as string}`,
         false,
+      );
+      break;
+    case 'UPDATE_STOCK':
+      await updateProductStock(
+        mutation.payload.productId as number,
+        mutation.payload.quantity as number,
       );
       break;
   }
