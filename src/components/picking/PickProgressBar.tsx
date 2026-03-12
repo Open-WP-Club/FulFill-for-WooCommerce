@@ -1,5 +1,6 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
+import {useTheme} from '../../theme/ThemeContext';
 import type {PickItem} from '../../types/picking';
 
 interface PickProgressBarProps {
@@ -7,6 +8,7 @@ interface PickProgressBarProps {
 }
 
 export function PickProgressBar({items}: PickProgressBarProps) {
+  const theme = useTheme();
   const total = items.length;
   const done = items.filter(
     i => i.status === 'picked' || i.status === 'missing' || i.status === 'damaged',
@@ -15,10 +17,12 @@ export function PickProgressBar({items}: PickProgressBarProps) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.barBg}>
-        <View style={[styles.barFill, {width: `${progress * 100}%`}]} />
+      <View style={[styles.barBg, {backgroundColor: theme.border}]}>
+        <View
+          style={[styles.barFill, {width: `${progress * 100}%`, backgroundColor: theme.success}]}
+        />
       </View>
-      <Text style={styles.text}>
+      <Text style={[styles.text, {color: theme.textTertiary}]}>
         {done}/{total} items
       </Text>
     </View>
@@ -32,18 +36,15 @@ const styles = StyleSheet.create({
   },
   barBg: {
     height: 8,
-    backgroundColor: '#E5E7EB',
     borderRadius: 4,
     overflow: 'hidden',
   },
   barFill: {
     height: '100%',
-    backgroundColor: '#10B981',
     borderRadius: 4,
   },
   text: {
     fontSize: 13,
-    color: '#6B7280',
     marginTop: 4,
     textAlign: 'center',
   },

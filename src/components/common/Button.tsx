@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   type ViewStyle,
 } from 'react-native';
+import {useTheme} from '../../theme/ThemeContext';
 
 interface ButtonProps {
   title: string;
@@ -24,12 +25,14 @@ export function Button({
   disabled = false,
   style,
 }: ButtonProps) {
+  const theme = useTheme();
+
   const bgColor =
     variant === 'primary'
-      ? '#4F46E5'
+      ? theme.primary
       : variant === 'danger'
-        ? '#DC2626'
-        : '#6B7280';
+        ? theme.danger
+        : theme.textTertiary;
 
   return (
     <TouchableOpacity
@@ -43,9 +46,9 @@ export function Button({
       disabled={disabled || loading}
       activeOpacity={0.7}>
       {loading ? (
-        <ActivityIndicator color="#fff" size="small" />
+        <ActivityIndicator color={theme.textOnPrimary} size="small" />
       ) : (
-        <Text style={styles.text}>{title}</Text>
+        <Text style={[styles.text, {color: theme.textOnPrimary}]}>{title}</Text>
       )}
     </TouchableOpacity>
   );
@@ -61,7 +64,6 @@ const styles = StyleSheet.create({
     minHeight: 48,
   },
   text: {
-    color: '#fff',
     fontSize: 16,
     fontWeight: '600',
   },

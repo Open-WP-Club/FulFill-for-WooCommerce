@@ -10,13 +10,29 @@ import {
 import {Card} from '../../components/common/Card';
 import {Button} from '../../components/common/Button';
 import {useAnalyticsStore} from '../../stores/analyticsStore';
+import {useTheme} from '../../theme/ThemeContext';
+import type {ThemeColors} from '../../theme/colors';
 import type {PickSessionRecord} from '../../types/analytics';
 
-function StatCard({label, value, color}: {label: string; value: string; color: string}) {
+function StatCard({
+  label,
+  value,
+  color,
+  theme,
+}: {
+  label: string;
+  value: string;
+  color: string;
+  theme: ThemeColors;
+}) {
   return (
-    <View style={[statStyles.card, {borderLeftColor: color}]}>
-      <Text style={statStyles.value}>{value}</Text>
-      <Text style={statStyles.label}>{label}</Text>
+    <View
+      style={[
+        statStyles.card,
+        {backgroundColor: theme.surface, borderLeftColor: color},
+      ]}>
+      <Text style={[statStyles.value, {color: theme.textPrimary}]}>{value}</Text>
+      <Text style={[statStyles.label, {color: theme.textTertiary}]}>{label}</Text>
     </View>
   );
 }
@@ -24,7 +40,6 @@ function StatCard({label, value, color}: {label: string; value: string; color: s
 const statStyles = StyleSheet.create({
   card: {
     flex: 1,
-    backgroundColor: '#fff',
     borderRadius: 8,
     padding: 12,
     borderLeftWidth: 3,
@@ -32,16 +47,15 @@ const statStyles = StyleSheet.create({
   value: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#111827',
   },
   label: {
     fontSize: 12,
-    color: '#6B7280',
     marginTop: 2,
   },
 });
 
 export function AnalyticsDashboardScreen() {
+  const theme = useTheme();
   const {sessions, pickerName, setPickerName, clearSessions, getStats} =
     useAnalyticsStore();
   const stats = getStats();
@@ -58,18 +72,24 @@ export function AnalyticsDashboardScreen() {
   };
 
   const renderSession = ({item}: {item: PickSessionRecord}) => (
-    <View style={styles.sessionRow}>
+    <View
+      style={[
+        styles.sessionRow,
+        {backgroundColor: theme.surface, borderBottomColor: theme.borderLight},
+      ]}>
       <View style={styles.sessionInfo}>
-        <Text style={styles.sessionOrder}>Order #{item.orderNumber}</Text>
-        <Text style={styles.sessionDate}>
+        <Text style={[styles.sessionOrder, {color: theme.textPrimary}]}>
+          Order #{item.orderNumber}
+        </Text>
+        <Text style={[styles.sessionDate, {color: theme.textMuted}]}>
           {new Date(item.completedAt).toLocaleDateString()}
         </Text>
       </View>
       <View style={styles.sessionStats}>
-        <Text style={styles.sessionPicked}>
+        <Text style={[styles.sessionPicked, {color: theme.success}]}>
           {item.pickedCorrectly}/{item.totalItems}
         </Text>
-        <Text style={styles.sessionDuration}>
+        <Text style={[styles.sessionDuration, {color: theme.textTertiary}]}>
           {formatDuration(item.durationMs)}
         </Text>
       </View>
@@ -77,53 +97,66 @@ export function AnalyticsDashboardScreen() {
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {backgroundColor: theme.background}]}>
       <FlatList
         data={sessions}
         renderItem={renderSession}
         keyExtractor={item => item.sessionId}
         ListHeaderComponent={
           <>
-            {/* Picker Name */}
             <Card>
-              <Text style={styles.sectionTitle}>Picker</Text>
+              <Text style={[styles.sectionTitle, {color: theme.textPrimary}]}>
+                Picker
+              </Text>
               <TextInput
-                style={styles.nameInput}
+                style={[
+                  styles.nameInput,
+                  {
+                    backgroundColor: theme.inputBg,
+                    borderColor: theme.inputBorder,
+                    color: theme.inputText,
+                  },
+                ]}
                 placeholder="Enter your name"
+                placeholderTextColor={theme.textMuted}
                 value={pickerName}
                 onChangeText={setPickerName}
               />
             </Card>
 
-            {/* Stats Grid */}
             <View style={styles.statsGrid}>
               <StatCard
                 label="Sessions today"
                 value={stats.sessionsToday.toString()}
-                color="#4F46E5"
+                color={theme.primary}
+                theme={theme}
               />
               <StatCard
                 label="Total picked"
                 value={stats.totalItemsPicked.toString()}
-                color="#10B981"
+                color={theme.success}
+                theme={theme}
               />
             </View>
             <View style={styles.statsGrid}>
               <StatCard
                 label="Avg time/item"
                 value={formatDuration(stats.avgTimePerItemMs)}
-                color="#F59E0B"
+                color={theme.warning}
+                theme={theme}
               />
               <StatCard
                 label="Accuracy"
                 value={`${Math.round(stats.accuracyRate * 100)}%`}
-                color={stats.accuracyRate >= 0.95 ? '#10B981' : '#EF4444'}
+                color={stats.accuracyRate >= 0.95 ? theme.success : theme.error}
+                theme={theme}
               />
             </View>
 
-            {/* History header */}
             <View style={styles.historyHeader}>
-              <Text style={styles.sectionTitle}>Recent Sessions</Text>
+              <Text style={[styles.sectionTitle, {color: theme.textPrimary}]}>
+                Recent Sessions
+              </Text>
               {sessions.length > 0 && (
                 <Button
                   title="Clear"
@@ -148,7 +181,9 @@ export function AnalyticsDashboardScreen() {
           </>
         }
         ListEmptyComponent={
-          <Text style={styles.empty}>No pick sessions recorded yet.</Text>
+          <Text style={[styles.empty, {color: theme.textMuted}]}>
+            No pick sessions recorded yet.
+          </Text>
         }
       />
     </View>
@@ -158,22 +193,17 @@ export function AnalyticsDashboardScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#111827',
     marginBottom: 8,
   },
   nameInput: {
-    backgroundColor: '#F9FAFB',
     borderWidth: 1,
-    borderColor: '#D1D5DB',
     borderRadius: 8,
     padding: 10,
     fontSize: 15,
-    color: '#111827',
   },
   statsGrid: {
     flexDirection: 'row',
@@ -195,19 +225,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     paddingHorizontal: 16,
-    backgroundColor: '#fff',
     borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
   },
   sessionInfo: {},
   sessionOrder: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#111827',
   },
   sessionDate: {
     fontSize: 12,
-    color: '#9CA3AF',
     marginTop: 2,
   },
   sessionStats: {
@@ -216,17 +242,14 @@ const styles = StyleSheet.create({
   sessionPicked: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#10B981',
   },
   sessionDuration: {
     fontSize: 12,
-    color: '#6B7280',
     marginTop: 2,
   },
   empty: {
     padding: 24,
     textAlign: 'center',
-    color: '#9CA3AF',
     fontSize: 14,
   },
 });

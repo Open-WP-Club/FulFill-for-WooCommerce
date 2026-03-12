@@ -5,18 +5,22 @@ import {OrdersStackNavigator} from './OrdersStackNavigator';
 import {ScannerScreen} from '../screens/scanner/ScannerScreen';
 import {AnalyticsDashboardScreen} from '../screens/analytics/AnalyticsDashboardScreen';
 import {SettingsScreen} from '../screens/settings/SettingsScreen';
+import {useTheme} from '../theme/ThemeContext';
 import type {TabParamList} from '../types/navigation';
 
 const Tab = createBottomTabNavigator<TabParamList>();
 
 export function TabNavigator() {
+  const theme = useTheme();
+
   return (
     <Tab.Navigator
       screenOptions={{
-        tabBarActiveTintColor: '#4F46E5',
-        tabBarInactiveTintColor: '#9CA3AF',
+        tabBarActiveTintColor: theme.primary,
+        tabBarInactiveTintColor: theme.textMuted,
         tabBarStyle: {
-          borderTopColor: '#E5E7EB',
+          backgroundColor: theme.tabBarBg,
+          borderTopColor: theme.tabBarBorder,
         },
       }}>
       <Tab.Screen
@@ -35,8 +39,8 @@ export function TabNavigator() {
         component={ScannerScreen}
         options={{
           title: 'Scan',
-          headerStyle: {backgroundColor: '#4F46E5'},
-          headerTintColor: '#fff',
+          headerStyle: {backgroundColor: theme.primary},
+          headerTintColor: theme.textOnPrimary,
           tabBarIcon: ({color, size}) => (
             <Icon name="qr-code-scanner" size={size} color={color} />
           ),
@@ -47,8 +51,8 @@ export function TabNavigator() {
         component={AnalyticsDashboardScreen}
         options={{
           title: 'Analytics',
-          headerStyle: {backgroundColor: '#4F46E5'},
-          headerTintColor: '#fff',
+          headerStyle: {backgroundColor: theme.primary},
+          headerTintColor: theme.textOnPrimary,
           tabBarIcon: ({color, size}) => (
             <Icon name="bar-chart" size={size} color={color} />
           ),
@@ -59,8 +63,8 @@ export function TabNavigator() {
         component={SettingsScreen}
         options={{
           title: 'Settings',
-          headerStyle: {backgroundColor: '#4F46E5'},
-          headerTintColor: '#fff',
+          headerStyle: {backgroundColor: theme.primary},
+          headerTintColor: theme.textOnPrimary,
           tabBarIcon: ({color, size}) => (
             <Icon name="settings" size={size} color={color} />
           ),

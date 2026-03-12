@@ -17,6 +17,7 @@ import {OrderLineItem} from '../../components/orders/OrderLineItem';
 import {LoadingSpinner} from '../../components/common/LoadingSpinner';
 import {OfflineBanner} from '../../components/common/OfflineBanner';
 import {useOrderDetail} from '../../hooks/useOrderDetail';
+import {useTheme} from '../../theme/ThemeContext';
 import {
   formatCurrency,
   formatDate,
@@ -36,6 +37,7 @@ const STATUS_ACTIONS: Array<{label: string; status: WcOrderStatus}> = [
 ];
 
 export function OrderDetailScreen({route, navigation}: Props) {
+  const theme = useTheme();
   const {orderId} = route.params;
   const {order, notes, isLoading, changeStatus, addNote} =
     useOrderDetail(orderId);
@@ -82,47 +84,57 @@ export function OrderDetailScreen({route, navigation}: Props) {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {backgroundColor: theme.background}]}>
       <OfflineBanner />
       <ScrollView contentContainerStyle={styles.content}>
-        {/* Header */}
         <Card>
           <View style={styles.headerRow}>
-            <Text style={styles.orderNumber}>Order #{order.number}</Text>
+            <Text style={[styles.orderNumber, {color: theme.textPrimary}]}>
+              Order #{order.number}
+            </Text>
             <StatusBadge status={order.status} />
           </View>
-          <Text style={styles.date}>{formatDate(order.date_created)}</Text>
-          <Text style={styles.total}>
+          <Text style={[styles.date, {color: theme.textMuted}]}>
+            {formatDate(order.date_created)}
+          </Text>
+          <Text style={[styles.total, {color: theme.primary}]}>
             {formatCurrency(order.total, order.currency)}
           </Text>
         </Card>
 
-        {/* Customer */}
         <Card>
-          <Text style={styles.sectionTitle}>Customer</Text>
-          <Text style={styles.customerName}>
+          <Text style={[styles.sectionTitle, {color: theme.textPrimary}]}>
+            Customer
+          </Text>
+          <Text style={[styles.customerName, {color: theme.textSecondary}]}>
             {formatCustomerName(order.billing)}
           </Text>
           {order.billing.email && (
-            <Text style={styles.detail}>{order.billing.email}</Text>
+            <Text style={[styles.detail, {color: theme.textTertiary}]}>
+              {order.billing.email}
+            </Text>
           )}
           {order.billing.phone && (
-            <Text style={styles.detail}>{order.billing.phone}</Text>
+            <Text style={[styles.detail, {color: theme.textTertiary}]}>
+              {order.billing.phone}
+            </Text>
           )}
         </Card>
 
-        {/* Shipping Address */}
         <Card>
-          <Text style={styles.sectionTitle}>Shipping Address</Text>
-          <Text style={styles.detail}>
+          <Text style={[styles.sectionTitle, {color: theme.textPrimary}]}>
+            Shipping Address
+          </Text>
+          <Text style={[styles.detail, {color: theme.textTertiary}]}>
             {formatCustomerName(order.shipping)}
           </Text>
-          <Text style={styles.detail}>{formatAddress(order.shipping)}</Text>
+          <Text style={[styles.detail, {color: theme.textTertiary}]}>
+            {formatAddress(order.shipping)}
+          </Text>
         </Card>
 
-        {/* Line Items */}
         <Card>
-          <Text style={styles.sectionTitle}>Items</Text>
+          <Text style={[styles.sectionTitle, {color: theme.textPrimary}]}>Items</Text>
           {order.line_items.map(item => (
             <OrderLineItem
               key={item.id}
@@ -132,52 +144,64 @@ export function OrderDetailScreen({route, navigation}: Props) {
           ))}
         </Card>
 
-        {/* Actions */}
         <Card>
-          <Text style={styles.sectionTitle}>Actions</Text>
+          <Text style={[styles.sectionTitle, {color: theme.textPrimary}]}>
+            Actions
+          </Text>
           <Button
             title="Start Pick & Pack"
             onPress={handleStartPicking}
             style={styles.actionButton}
           />
           <View style={styles.statusActions}>
-            {STATUS_ACTIONS.map(action => (
-              <TouchableOpacity
-                key={action.status}
-                style={[
-                  styles.statusBtn,
-                  order.status === action.status && styles.statusBtnActive,
-                ]}
-                onPress={() => handleStatusChange(action.status)}>
-                <Text
+            {STATUS_ACTIONS.map(action => {
+              const isActive = order.status === action.status;
+              return (
+                <TouchableOpacity
+                  key={action.status}
                   style={[
-                    styles.statusBtnText,
-                    order.status === action.status &&
-                      styles.statusBtnTextActive,
-                  ]}>
-                  {action.label}
-                </Text>
-              </TouchableOpacity>
-            ))}
+                    styles.statusBtn,
+                    {backgroundColor: isActive ? theme.primary : theme.surfaceSecondary},
+                  ]}
+                  onPress={() => handleStatusChange(action.status)}>
+                  <Text
+                    style={[
+                      styles.statusBtnText,
+                      {color: isActive ? theme.textOnPrimary : theme.textTertiary},
+                    ]}>
+                    {action.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
         </Card>
 
-        {/* Notes */}
         <Card>
           <View style={styles.notesHeader}>
-            <Text style={styles.sectionTitle}>Notes</Text>
+            <Text style={[styles.sectionTitle, {color: theme.textPrimary}]}>
+              Notes
+            </Text>
             <TouchableOpacity onPress={() => setNoteModalVisible(true)}>
-              <Text style={styles.addNote}>+ Add Note</Text>
+              <Text style={[styles.addNote, {color: theme.primary}]}>+ Add Note</Text>
             </TouchableOpacity>
           </View>
           {notes.length === 0 ? (
-            <Text style={styles.noNotes}>No notes yet</Text>
+            <Text style={[styles.noNotes, {color: theme.textMuted}]}>
+              No notes yet
+            </Text>
           ) : (
             notes.map(note => (
-              <View key={note.id} style={styles.note}>
-                <Text style={styles.noteAuthor}>{note.author}</Text>
-                <Text style={styles.noteText}>{note.note}</Text>
-                <Text style={styles.noteDate}>
+              <View
+                key={note.id}
+                style={[styles.note, {borderBottomColor: theme.borderLight}]}>
+                <Text style={[styles.noteAuthor, {color: theme.textSecondary}]}>
+                  {note.author}
+                </Text>
+                <Text style={[styles.noteText, {color: theme.textTertiary}]}>
+                  {note.note}
+                </Text>
+                <Text style={[styles.noteDate, {color: theme.textMuted}]}>
                   {formatDate(note.date_created)}
                 </Text>
               </View>
@@ -186,18 +210,27 @@ export function OrderDetailScreen({route, navigation}: Props) {
         </Card>
       </ScrollView>
 
-      {/* Add Note Modal */}
       <Modal
         visible={noteModalVisible}
         transparent
         animationType="slide"
         onRequestClose={() => setNoteModalVisible(false)}>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Add Note</Text>
+        <View style={[styles.modalOverlay, {backgroundColor: theme.modalOverlay}]}>
+          <View style={[styles.modalContent, {backgroundColor: theme.modalBg}]}>
+            <Text style={[styles.modalTitle, {color: theme.textPrimary}]}>
+              Add Note
+            </Text>
             <TextInput
-              style={styles.noteInput}
+              style={[
+                styles.noteInput,
+                {
+                  backgroundColor: theme.inputBg,
+                  borderColor: theme.inputBorder,
+                  color: theme.inputText,
+                },
+              ]}
               placeholder="Write a note..."
+              placeholderTextColor={theme.textMuted}
               value={noteText}
               onChangeText={setNoteText}
               multiline
@@ -222,7 +255,6 @@ export function OrderDetailScreen({route, navigation}: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
   },
   content: {
     paddingVertical: 8,
@@ -236,32 +268,26 @@ const styles = StyleSheet.create({
   orderNumber: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#111827',
   },
   date: {
     fontSize: 14,
-    color: '#9CA3AF',
     marginBottom: 4,
   },
   total: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#4F46E5',
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#111827',
     marginBottom: 8,
   },
   customerName: {
     fontSize: 15,
     fontWeight: '500',
-    color: '#374151',
   },
   detail: {
     fontSize: 14,
-    color: '#6B7280',
     marginTop: 2,
   },
   actionButton: {
@@ -276,18 +302,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 8,
-    backgroundColor: '#F3F4F6',
-  },
-  statusBtnActive: {
-    backgroundColor: '#4F46E5',
   },
   statusBtnText: {
     fontSize: 13,
-    color: '#6B7280',
     fontWeight: '500',
-  },
-  statusBtnTextActive: {
-    color: '#fff',
   },
   notesHeader: {
     flexDirection: 'row',
@@ -297,41 +315,33 @@ const styles = StyleSheet.create({
   },
   addNote: {
     fontSize: 14,
-    color: '#4F46E5',
     fontWeight: '600',
   },
   noNotes: {
     fontSize: 14,
-    color: '#9CA3AF',
     fontStyle: 'italic',
   },
   note: {
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
   },
   noteAuthor: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#374151',
   },
   noteText: {
     fontSize: 14,
-    color: '#6B7280',
     marginTop: 2,
   },
   noteDate: {
     fontSize: 12,
-    color: '#9CA3AF',
     marginTop: 4,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: '#fff',
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     padding: 24,
@@ -339,13 +349,10 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#111827',
     marginBottom: 16,
   },
   noteInput: {
-    backgroundColor: '#F9FAFB',
     borderWidth: 1,
-    borderColor: '#D1D5DB',
     borderRadius: 8,
     padding: 12,
     fontSize: 15,

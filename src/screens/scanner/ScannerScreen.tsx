@@ -8,9 +8,11 @@ import {useBarcodeScanner} from '../../hooks/useBarcodeScanner';
 import {fetchProductBySku} from '../../api/products';
 import {playSuccessFeedback, playErrorFeedback} from '../../utils/feedback';
 import {StockIndicator} from '../../components/picking/StockIndicator';
+import {useTheme} from '../../theme/ThemeContext';
 import type {WcProduct} from '../../types/product';
 
 export function ScannerScreen() {
+  const theme = useTheme();
   const [scannedProduct, setScannedProduct] = useState<WcProduct | null>(null);
   const [lastBarcode, setLastBarcode] = useState<string | null>(null);
   const [searching, setSearching] = useState(false);
@@ -42,29 +44,37 @@ export function ScannerScreen() {
   });
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {backgroundColor: theme.cameraBg}]}>
       <View style={styles.camera}>
         <CameraView isActive={isActive} onCodeScanned={handleCodeScanned} />
         <ScanGuide />
       </View>
 
-      <View style={styles.results}>
+      <View style={[styles.results, {backgroundColor: theme.background}]}>
         {lastBarcode && (
           <Card>
-            <Text style={styles.label}>Scanned Barcode</Text>
-            <Text style={styles.barcode}>{lastBarcode}</Text>
+            <Text style={[styles.label, {color: theme.textMuted}]}>
+              Scanned Barcode
+            </Text>
+            <Text style={[styles.barcode, {color: theme.textPrimary}]}>
+              {lastBarcode}
+            </Text>
 
             {searching && (
-              <Text style={styles.searching}>Searching product...</Text>
+              <Text style={[styles.searching, {color: theme.textTertiary}]}>
+                Searching product...
+              </Text>
             )}
 
             {scannedProduct && (
-              <View style={styles.product}>
-                <Text style={styles.productName}>{scannedProduct.name}</Text>
-                <Text style={styles.productSku}>
+              <View style={[styles.product, {borderTopColor: theme.border}]}>
+                <Text style={[styles.productName, {color: theme.textPrimary}]}>
+                  {scannedProduct.name}
+                </Text>
+                <Text style={[styles.productMeta, {color: theme.textTertiary}]}>
                   SKU: {scannedProduct.sku}
                 </Text>
-                <Text style={styles.productPrice}>
+                <Text style={[styles.productMeta, {color: theme.textTertiary}]}>
                   Price: {scannedProduct.price}
                 </Text>
                 <StockIndicator
@@ -75,7 +85,9 @@ export function ScannerScreen() {
             )}
 
             {!searching && !scannedProduct && (
-              <Text style={styles.notFound}>Product not found</Text>
+              <Text style={[styles.notFound, {color: theme.error}]}>
+                Product not found
+              </Text>
             )}
           </Card>
         )}
@@ -93,58 +105,44 @@ export function ScannerScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
   },
   camera: {
     flex: 1,
     position: 'relative',
   },
   results: {
-    backgroundColor: '#F9FAFB',
     padding: 16,
     minHeight: 200,
   },
   label: {
     fontSize: 12,
-    color: '#9CA3AF',
     textTransform: 'uppercase',
     fontWeight: '600',
   },
   barcode: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#111827',
     marginTop: 4,
     marginBottom: 12,
   },
   searching: {
     fontSize: 14,
-    color: '#6B7280',
     fontStyle: 'italic',
   },
   product: {
     paddingTop: 8,
     borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
   },
   productName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#111827',
   },
-  productSku: {
+  productMeta: {
     fontSize: 14,
-    color: '#6B7280',
-    marginTop: 2,
-  },
-  productPrice: {
-    fontSize: 14,
-    color: '#6B7280',
     marginTop: 2,
   },
   notFound: {
     fontSize: 14,
-    color: '#EF4444',
   },
   scanBtn: {
     marginTop: 12,

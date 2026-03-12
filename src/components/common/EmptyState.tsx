@@ -1,6 +1,7 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import {useTheme} from '../../theme/ThemeContext';
 
 interface EmptyStateProps {
   icon: string;
@@ -9,11 +10,15 @@ interface EmptyStateProps {
 }
 
 export function EmptyState({icon, title, message}: EmptyStateProps) {
+  const theme = useTheme();
+
   return (
     <View style={styles.container}>
-      <Icon name={icon} size={64} color="#D1D5DB" />
-      <Text style={styles.title}>{title}</Text>
-      {message && <Text style={styles.message}>{message}</Text>}
+      <Icon name={icon} size={64} color={theme.inputBorder} />
+      <Text style={[styles.title, {color: theme.textTertiary}]}>{title}</Text>
+      {message && (
+        <Text style={[styles.message, {color: theme.textMuted}]}>{message}</Text>
+      )}
     </View>
   );
 }
@@ -28,12 +33,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#6B7280',
     marginTop: 16,
   },
   message: {
     fontSize: 14,
-    color: '#9CA3AF',
     marginTop: 8,
     textAlign: 'center',
   },

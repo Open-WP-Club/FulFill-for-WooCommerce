@@ -1,14 +1,17 @@
 import React from 'react';
 import {View, ActivityIndicator, StyleSheet} from 'react-native';
+import {useTheme} from '../../theme/ThemeContext';
 
 interface LoadingSpinnerProps {
   size?: 'small' | 'large';
 }
 
 export function LoadingSpinner({size = 'large'}: LoadingSpinnerProps) {
+  const theme = useTheme();
+
   return (
     <View style={styles.container}>
-      <ActivityIndicator size={size} color="#4F46E5" />
+      <ActivityIndicator size={size} color={theme.primary} />
     </View>
   );
 }

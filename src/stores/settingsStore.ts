@@ -1,6 +1,7 @@
 import {create} from 'zustand';
 import {persist, createJSONStorage} from 'zustand/middleware';
 import {zustandMMKVStorage} from '../utils/storage';
+import type {ThemeMode} from '../theme/colors';
 
 interface SettingsState {
   soundEnabled: boolean;
@@ -9,6 +10,7 @@ interface SettingsState {
   pollingIntervalMs: number;
   notificationsEnabled: boolean;
   lowStockThreshold: number;
+  themeMode: ThemeMode;
 
   setSoundEnabled: (enabled: boolean) => void;
   setHapticEnabled: (enabled: boolean) => void;
@@ -16,6 +18,7 @@ interface SettingsState {
   setPollingInterval: (ms: number) => void;
   setNotificationsEnabled: (enabled: boolean) => void;
   setLowStockThreshold: (n: number) => void;
+  setThemeMode: (mode: ThemeMode) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -27,6 +30,7 @@ export const useSettingsStore = create<SettingsState>()(
       pollingIntervalMs: 30000,
       notificationsEnabled: true,
       lowStockThreshold: 5,
+      themeMode: 'system' as ThemeMode,
 
       setSoundEnabled: enabled => set({soundEnabled: enabled}),
       setHapticEnabled: enabled => set({hapticEnabled: enabled}),
@@ -34,6 +38,7 @@ export const useSettingsStore = create<SettingsState>()(
       setPollingInterval: ms => set({pollingIntervalMs: ms}),
       setNotificationsEnabled: enabled => set({notificationsEnabled: enabled}),
       setLowStockThreshold: n => set({lowStockThreshold: n}),
+      setThemeMode: mode => set({themeMode: mode}),
     }),
     {
       name: 'settings-storage',

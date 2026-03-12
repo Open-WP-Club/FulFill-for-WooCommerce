@@ -6,8 +6,17 @@ import {useAuthStore} from '../../stores/authStore';
 import {useSettingsStore} from '../../stores/settingsStore';
 import {useSyncStore} from '../../stores/syncStore';
 import {useSync} from '../../hooks/useSync';
+import {useTheme} from '../../theme/ThemeContext';
+import type {ThemeMode} from '../../theme/colors';
+
+const THEME_OPTIONS: Array<{label: string; value: ThemeMode}> = [
+  {label: 'System', value: 'system'},
+  {label: 'Light', value: 'light'},
+  {label: 'Dark', value: 'dark'},
+];
 
 export function SettingsScreen() {
+  const theme = useTheme();
   const siteUrl = useAuthStore(s => s.siteUrl);
   const logout = useAuthStore(s => s.logout);
   const {
@@ -16,11 +25,13 @@ export function SettingsScreen() {
     autoSyncEnabled,
     notificationsEnabled,
     lowStockThreshold,
+    themeMode,
     setSoundEnabled,
     setHapticEnabled,
     setAutoSyncEnabled,
     setNotificationsEnabled,
     setLowStockThreshold,
+    setThemeMode,
   } = useSettingsStore();
   const clearQueue = useSyncStore(s => s.clearQueue);
   const {pendingCount, isSyncing, lastSyncAt, isConnected} = useSync();
@@ -37,54 +48,95 @@ export function SettingsScreen() {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={[styles.container, {backgroundColor: theme.background}]}>
       {/* Connection */}
       <Card>
-        <Text style={styles.sectionTitle}>Connection</Text>
+        <Text style={[styles.sectionTitle, {color: theme.textPrimary}]}>
+          Connection
+        </Text>
         <View style={styles.row}>
-          <Text style={styles.label}>Store URL</Text>
-          <Text style={styles.value} numberOfLines={1}>
+          <Text style={[styles.label, {color: theme.textSecondary}]}>Store URL</Text>
+          <Text style={[styles.value, {color: theme.textTertiary}]} numberOfLines={1}>
             {siteUrl}
           </Text>
         </View>
         <View style={styles.row}>
-          <Text style={styles.label}>Status</Text>
+          <Text style={[styles.label, {color: theme.textSecondary}]}>Status</Text>
           <View style={styles.statusRow}>
             <View
               style={[
                 styles.dot,
-                {backgroundColor: isConnected ? '#10B981' : '#EF4444'},
+                {backgroundColor: isConnected ? theme.success : theme.error},
               ]}
             />
-            <Text style={styles.value}>
+            <Text style={[styles.value, {color: theme.textTertiary}]}>
               {isConnected ? 'Connected' : 'Offline'}
             </Text>
           </View>
         </View>
       </Card>
 
+      {/* Appearance */}
+      <Card>
+        <Text style={[styles.sectionTitle, {color: theme.textPrimary}]}>
+          Appearance
+        </Text>
+        <View style={styles.themeRow}>
+          {THEME_OPTIONS.map(option => {
+            const isActive = themeMode === option.value;
+            return (
+              <TouchableOpacity
+                key={option.value}
+                style={[
+                  styles.themeBtn,
+                  {backgroundColor: isActive ? theme.primary : theme.surfaceSecondary},
+                ]}
+                onPress={() => setThemeMode(option.value)}>
+                <Text
+                  style={[
+                    styles.themeBtnText,
+                    {color: isActive ? theme.textOnPrimary : theme.textTertiary},
+                  ]}>
+                  {option.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </Card>
+
       {/* Preferences */}
       <Card>
-        <Text style={styles.sectionTitle}>Preferences</Text>
+        <Text style={[styles.sectionTitle, {color: theme.textPrimary}]}>
+          Preferences
+        </Text>
         <View style={styles.switchRow}>
-          <Text style={styles.label}>Sound effects</Text>
+          <Text style={[styles.label, {color: theme.textSecondary}]}>
+            Sound effects
+          </Text>
           <Switch value={soundEnabled} onValueChange={setSoundEnabled} />
         </View>
         <View style={styles.switchRow}>
-          <Text style={styles.label}>Haptic feedback</Text>
+          <Text style={[styles.label, {color: theme.textSecondary}]}>
+            Haptic feedback
+          </Text>
           <Switch value={hapticEnabled} onValueChange={setHapticEnabled} />
         </View>
         <View style={styles.switchRow}>
-          <Text style={styles.label}>Auto sync</Text>
+          <Text style={[styles.label, {color: theme.textSecondary}]}>Auto sync</Text>
           <Switch value={autoSyncEnabled} onValueChange={setAutoSyncEnabled} />
         </View>
       </Card>
 
       {/* Notifications */}
       <Card>
-        <Text style={styles.sectionTitle}>Notifications</Text>
+        <Text style={[styles.sectionTitle, {color: theme.textPrimary}]}>
+          Notifications
+        </Text>
         <View style={styles.switchRow}>
-          <Text style={styles.label}>New order alerts</Text>
+          <Text style={[styles.label, {color: theme.textSecondary}]}>
+            New order alerts
+          </Text>
           <Switch
             value={notificationsEnabled}
             onValueChange={setNotificationsEnabled}
@@ -94,22 +146,32 @@ export function SettingsScreen() {
 
       {/* Inventory */}
       <Card>
-        <Text style={styles.sectionTitle}>Inventory</Text>
+        <Text style={[styles.sectionTitle, {color: theme.textPrimary}]}>
+          Inventory
+        </Text>
         <View style={styles.row}>
-          <Text style={styles.label}>Low stock threshold</Text>
+          <Text style={[styles.label, {color: theme.textSecondary}]}>
+            Low stock threshold
+          </Text>
           <View style={styles.stepper}>
             <TouchableOpacity
               onPress={() =>
                 setLowStockThreshold(Math.max(1, lowStockThreshold - 1))
               }
-              style={styles.stepperBtn}>
-              <Text style={styles.stepperBtnText}>-</Text>
+              style={[styles.stepperBtn, {backgroundColor: theme.surfaceSecondary}]}>
+              <Text style={[styles.stepperBtnText, {color: theme.textSecondary}]}>
+                -
+              </Text>
             </TouchableOpacity>
-            <Text style={styles.stepperValue}>{lowStockThreshold}</Text>
+            <Text style={[styles.stepperValue, {color: theme.textPrimary}]}>
+              {lowStockThreshold}
+            </Text>
             <TouchableOpacity
               onPress={() => setLowStockThreshold(lowStockThreshold + 1)}
-              style={styles.stepperBtn}>
-              <Text style={styles.stepperBtnText}>+</Text>
+              style={[styles.stepperBtn, {backgroundColor: theme.surfaceSecondary}]}>
+              <Text style={[styles.stepperBtnText, {color: theme.textSecondary}]}>
+                +
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -117,19 +179,29 @@ export function SettingsScreen() {
 
       {/* Sync */}
       <Card>
-        <Text style={styles.sectionTitle}>Sync</Text>
+        <Text style={[styles.sectionTitle, {color: theme.textPrimary}]}>Sync</Text>
         <View style={styles.row}>
-          <Text style={styles.label}>Pending changes</Text>
-          <Text style={styles.value}>{pendingCount}</Text>
+          <Text style={[styles.label, {color: theme.textSecondary}]}>
+            Pending changes
+          </Text>
+          <Text style={[styles.value, {color: theme.textTertiary}]}>
+            {pendingCount}
+          </Text>
         </View>
         <View style={styles.row}>
-          <Text style={styles.label}>Syncing</Text>
-          <Text style={styles.value}>{isSyncing ? 'Yes' : 'No'}</Text>
+          <Text style={[styles.label, {color: theme.textSecondary}]}>Syncing</Text>
+          <Text style={[styles.value, {color: theme.textTertiary}]}>
+            {isSyncing ? 'Yes' : 'No'}
+          </Text>
         </View>
         {lastSyncAt && (
           <View style={styles.row}>
-            <Text style={styles.label}>Last sync</Text>
-            <Text style={styles.value}>{lastSyncAt}</Text>
+            <Text style={[styles.label, {color: theme.textSecondary}]}>
+              Last sync
+            </Text>
+            <Text style={[styles.value, {color: theme.textTertiary}]}>
+              {lastSyncAt}
+            </Text>
           </View>
         )}
         {pendingCount > 0 && (
@@ -166,13 +238,11 @@ export function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
     paddingTop: 8,
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#111827',
     marginBottom: 12,
   },
   row: {
@@ -189,11 +259,9 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 15,
-    color: '#374151',
   },
   value: {
     fontSize: 15,
-    color: '#6B7280',
     maxWidth: 200,
   },
   statusRow: {
@@ -205,6 +273,20 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
+  },
+  themeRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  themeBtn: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  themeBtnText: {
+    fontSize: 14,
+    fontWeight: '600',
   },
   clearBtn: {
     marginTop: 12,
@@ -218,19 +300,16 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 8,
-    backgroundColor: '#F3F4F6',
     justifyContent: 'center',
     alignItems: 'center',
   },
   stepperBtnText: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#374151',
   },
   stepperValue: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#111827',
     minWidth: 24,
     textAlign: 'center',
   },

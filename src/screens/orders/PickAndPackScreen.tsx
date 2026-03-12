@@ -16,12 +16,14 @@ import {useToteStore} from '../../stores/toteStore';
 import {useAnalyticsStore} from '../../stores/analyticsStore';
 import {ToteBadge} from '../../components/picking/ToteBadge';
 import {ToteScanModal} from '../../components/picking/ToteScanModal';
+import {useTheme} from '../../theme/ThemeContext';
 import type {OrdersStackParamList} from '../../types/navigation';
 import type {PickItem} from '../../types/picking';
 
 type Props = NativeStackScreenProps<OrdersStackParamList, 'PickAndPack'>;
 
 export function PickAndPackScreen({route, navigation}: Props) {
+  const theme = useTheme();
   const {order} = route.params;
   const {changeStatus} = useOrderDetail(order.id);
   const {
@@ -60,7 +62,6 @@ export function PickAndPackScreen({route, navigation}: Props) {
         return;
       }
 
-      // Check if it's a tote barcode
       if (isToteBarcode(barcode)) {
         assignTote(order.id, order.number, barcode);
         playSuccessFeedback();
@@ -154,7 +155,7 @@ export function PickAndPackScreen({route, navigation}: Props) {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {backgroundColor: theme.background}]}>
       {showScanner && (
         <View style={styles.scannerContainer}>
           <CameraView
@@ -196,7 +197,11 @@ export function PickAndPackScreen({route, navigation}: Props) {
         style={styles.list}
       />
 
-      <View style={styles.footer}>
+      <View
+        style={[
+          styles.footer,
+          {backgroundColor: theme.surface, borderTopColor: theme.border},
+        ]}>
         <Button
           title={showScanner ? 'Hide Scanner' : 'Scan Items'}
           variant="secondary"
@@ -216,7 +221,6 @@ export function PickAndPackScreen({route, navigation}: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
   },
   scannerContainer: {
     height: 200,
@@ -229,9 +233,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 16,
     gap: 12,
-    backgroundColor: '#fff',
     borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
   },
   footerBtn: {
     flex: 1,

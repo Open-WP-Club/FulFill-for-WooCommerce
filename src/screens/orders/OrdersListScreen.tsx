@@ -7,12 +7,14 @@ import {LoadingSpinner} from '../../components/common/LoadingSpinner';
 import {EmptyState} from '../../components/common/EmptyState';
 import {OfflineBanner} from '../../components/common/OfflineBanner';
 import {useOrders} from '../../hooks/useOrders';
+import {useTheme} from '../../theme/ThemeContext';
 import type {OrdersStackParamList} from '../../types/navigation';
 import type {WcOrder} from '../../types/order';
 
 type Props = NativeStackScreenProps<OrdersStackParamList, 'OrdersList'>;
 
 export function OrdersListScreen({navigation}: Props) {
+  const theme = useTheme();
   const {
     orders,
     isLoading,
@@ -44,11 +46,19 @@ export function OrdersListScreen({navigation}: Props) {
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {backgroundColor: theme.background}]}>
       <OfflineBanner />
       <TextInput
-        style={styles.search}
+        style={[
+          styles.search,
+          {
+            backgroundColor: theme.inputBg,
+            borderColor: theme.border,
+            color: theme.inputText,
+          },
+        ]}
         placeholder="Search orders..."
+        placeholderTextColor={theme.textMuted}
         value={searchQuery}
         onChangeText={setSearchQuery}
         returnKeyType="search"
@@ -84,16 +94,13 @@ export function OrdersListScreen({navigation}: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
   },
   search: {
     marginHorizontal: 16,
     marginTop: 8,
     padding: 12,
-    backgroundColor: '#fff',
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
     fontSize: 15,
   },
   list: {

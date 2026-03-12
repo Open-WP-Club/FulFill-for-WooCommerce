@@ -1,5 +1,5 @@
 import React, {useEffect} from 'react';
-import {View, Text, StyleSheet, Animated} from 'react-native';
+import {Text, StyleSheet, Animated} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 interface ScanResultOverlayProps {

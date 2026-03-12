@@ -1,5 +1,6 @@
 import React from 'react';
 import {ScrollView, TouchableOpacity, Text, StyleSheet} from 'react-native';
+import {useTheme} from '../../theme/ThemeContext';
 import type {WcOrderStatus} from '../../types/order';
 
 const FILTERS: Array<{label: string; value: WcOrderStatus | 'all'}> = [
@@ -16,29 +17,34 @@ interface FilterBarProps {
 }
 
 export function FilterBar({activeFilter, onFilterChange}: FilterBarProps) {
+  const theme = useTheme();
+
   return (
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
       style={styles.container}
       contentContainerStyle={styles.content}>
-      {FILTERS.map(filter => (
-        <TouchableOpacity
-          key={filter.value}
-          style={[
-            styles.chip,
-            activeFilter === filter.value && styles.chipActive,
-          ]}
-          onPress={() => onFilterChange(filter.value)}>
-          <Text
+      {FILTERS.map(filter => {
+        const isActive = activeFilter === filter.value;
+        return (
+          <TouchableOpacity
+            key={filter.value}
             style={[
-              styles.chipText,
-              activeFilter === filter.value && styles.chipTextActive,
-            ]}>
-            {filter.label}
-          </Text>
-        </TouchableOpacity>
-      ))}
+              styles.chip,
+              {backgroundColor: isActive ? theme.primary : theme.surfaceSecondary},
+            ]}
+            onPress={() => onFilterChange(filter.value)}>
+            <Text
+              style={[
+                styles.chipText,
+                {color: isActive ? theme.textOnPrimary : theme.textTertiary},
+              ]}>
+              {filter.label}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
     </ScrollView>
   );
 }
@@ -56,18 +62,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#F3F4F6',
     marginRight: 8,
-  },
-  chipActive: {
-    backgroundColor: '#4F46E5',
   },
   chipText: {
     fontSize: 14,
-    color: '#6B7280',
     fontWeight: '500',
-  },
-  chipTextActive: {
-    color: '#fff',
   },
 });

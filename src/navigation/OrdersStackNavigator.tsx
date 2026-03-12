@@ -3,16 +3,19 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {OrdersListScreen} from '../screens/orders/OrdersListScreen';
 import {OrderDetailScreen} from '../screens/orders/OrderDetailScreen';
 import {PickAndPackScreen} from '../screens/orders/PickAndPackScreen';
+import {useTheme} from '../theme/ThemeContext';
 import type {OrdersStackParamList} from '../types/navigation';
 
 const Stack = createNativeStackNavigator<OrdersStackParamList>();
 
 export function OrdersStackNavigator() {
+  const theme = useTheme();
+
   return (
     <Stack.Navigator
       screenOptions={{
-        headerStyle: {backgroundColor: '#4F46E5'},
-        headerTintColor: '#fff',
+        headerStyle: {backgroundColor: theme.primary},
+        headerTintColor: theme.textOnPrimary,
         headerTitleStyle: {fontWeight: '600'},
       }}>
       <Stack.Screen

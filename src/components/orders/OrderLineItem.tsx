@@ -1,6 +1,7 @@
 import React from 'react';
 import {View, Text, Image, StyleSheet} from 'react-native';
 import {formatCurrency} from '../../utils/formatters';
+import {useTheme} from '../../theme/ThemeContext';
 import type {WcLineItem} from '../../types/order';
 
 interface OrderLineItemProps {
@@ -9,21 +10,31 @@ interface OrderLineItemProps {
 }
 
 export function OrderLineItem({item, currency}: OrderLineItemProps) {
+  const theme = useTheme();
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {borderBottomColor: theme.borderLight}]}>
       {item.image?.src ? (
         <Image source={{uri: item.image.src}} style={styles.image} />
       ) : (
-        <View style={[styles.image, styles.placeholder]} />
+        <View
+          style={[styles.image, {backgroundColor: theme.surfaceSecondary}]}
+        />
       )}
       <View style={styles.info}>
-        <Text style={styles.name} numberOfLines={2}>
+        <Text style={[styles.name, {color: theme.textPrimary}]} numberOfLines={2}>
           {item.name}
         </Text>
-        {item.sku ? <Text style={styles.sku}>SKU: {item.sku}</Text> : null}
+        {item.sku ? (
+          <Text style={[styles.sku, {color: theme.textMuted}]}>
+            SKU: {item.sku}
+          </Text>
+        ) : null}
         <View style={styles.row}>
-          <Text style={styles.quantity}>Qty: {item.quantity}</Text>
-          <Text style={styles.price}>
+          <Text style={[styles.quantity, {color: theme.textTertiary}]}>
+            Qty: {item.quantity}
+          </Text>
+          <Text style={[styles.price, {color: theme.textPrimary}]}>
             {formatCurrency(item.total, currency)}
           </Text>
         </View>
@@ -37,7 +48,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
   },
   image: {
     width: 56,
@@ -45,21 +55,16 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginRight: 12,
   },
-  placeholder: {
-    backgroundColor: '#F3F4F6',
-  },
   info: {
     flex: 1,
   },
   name: {
     fontSize: 15,
     fontWeight: '500',
-    color: '#111827',
     marginBottom: 2,
   },
   sku: {
     fontSize: 12,
-    color: '#9CA3AF',
     marginBottom: 4,
   },
   row: {
@@ -69,11 +74,9 @@ const styles = StyleSheet.create({
   },
   quantity: {
     fontSize: 14,
-    color: '#6B7280',
   },
   price: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#111827',
   },
 });

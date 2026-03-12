@@ -12,8 +12,10 @@ import {
 import {Button} from '../../components/common/Button';
 import {useAuthStore} from '../../stores/authStore';
 import {createApiClient} from '../../api/client';
+import {useTheme} from '../../theme/ThemeContext';
 
 export function LoginScreen() {
+  const theme = useTheme();
   const [siteUrl, setSiteUrl] = useState('');
   const [consumerKey, setConsumerKey] = useState('');
   const [consumerSecret, setConsumerSecret] = useState('');
@@ -35,13 +37,9 @@ export function LoginScreen() {
 
     setLoading(true);
     try {
-      // Temporarily set credentials to test
       login(siteUrl.trim(), consumerKey.trim(), consumerSecret.trim());
       const client = createApiClient();
-
-      // Test connection
       await client.get('/orders', {params: {per_page: 1}});
-      // Login successful — credentials already saved
     } catch {
       useAuthStore.getState().logout();
       Alert.alert(
@@ -55,19 +53,29 @@ export function LoginScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, {backgroundColor: theme.background}]}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <ScrollView
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled">
-        <Text style={styles.title}>FulFill</Text>
-        <Text style={styles.subtitle}>Connect to your WooCommerce store</Text>
+        <Text style={[styles.title, {color: theme.primary}]}>FulFill</Text>
+        <Text style={[styles.subtitle, {color: theme.textTertiary}]}>
+          Connect to your WooCommerce store
+        </Text>
 
         <View style={styles.form}>
-          <Text style={styles.label}>Store URL</Text>
+          <Text style={[styles.label, {color: theme.textSecondary}]}>Store URL</Text>
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              {
+                backgroundColor: theme.inputBg,
+                borderColor: theme.inputBorder,
+                color: theme.inputText,
+              },
+            ]}
             placeholder="https://yourstore.com"
+            placeholderTextColor={theme.textMuted}
             value={siteUrl}
             onChangeText={setSiteUrl}
             autoCapitalize="none"
@@ -75,20 +83,38 @@ export function LoginScreen() {
             keyboardType="url"
           />
 
-          <Text style={styles.label}>Consumer Key</Text>
+          <Text style={[styles.label, {color: theme.textSecondary}]}>Consumer Key</Text>
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              {
+                backgroundColor: theme.inputBg,
+                borderColor: theme.inputBorder,
+                color: theme.inputText,
+              },
+            ]}
             placeholder="ck_..."
+            placeholderTextColor={theme.textMuted}
             value={consumerKey}
             onChangeText={setConsumerKey}
             autoCapitalize="none"
             autoCorrect={false}
           />
 
-          <Text style={styles.label}>Consumer Secret</Text>
+          <Text style={[styles.label, {color: theme.textSecondary}]}>
+            Consumer Secret
+          </Text>
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              {
+                backgroundColor: theme.inputBg,
+                borderColor: theme.inputBorder,
+                color: theme.inputText,
+              },
+            ]}
             placeholder="cs_..."
+            placeholderTextColor={theme.textMuted}
             value={consumerSecret}
             onChangeText={setConsumerSecret}
             autoCapitalize="none"
@@ -111,7 +137,6 @@ export function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
   },
   content: {
     flexGrow: 1,
@@ -121,13 +146,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 36,
     fontWeight: '800',
-    color: '#4F46E5',
     textAlign: 'center',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#6B7280',
     textAlign: 'center',
     marginBottom: 40,
   },
@@ -137,18 +160,14 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#374151',
     marginBottom: 4,
     marginTop: 12,
   },
   input: {
-    backgroundColor: '#fff',
     borderWidth: 1,
-    borderColor: '#D1D5DB',
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
-    color: '#111827',
   },
   button: {
     marginTop: 24,
