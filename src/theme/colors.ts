@@ -2,9 +2,10 @@ export const colors = {
   light: {
     isDark: false,
 
-    // Primary
-    primary: '#4F46E5',
-    primaryLight: '#EEF2FF',
+    // Primary — from logo (#F97316 orange)
+    primary: '#F97316',
+    primaryDark: '#EA580C',
+    primaryLight: '#FFF7ED',
 
     // Backgrounds
     background: '#F9FAFB',
@@ -57,9 +58,10 @@ export const colors = {
   dark: {
     isDark: true,
 
-    // Primary
-    primary: '#6366F1',
-    primaryLight: '#1E1B4B',
+    // Primary — brighter orange for dark mode
+    primary: '#FB923C',
+    primaryDark: '#F97316',
+    primaryLight: '#431407',
 
     // Backgrounds
     background: '#111827',

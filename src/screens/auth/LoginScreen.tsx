@@ -8,11 +8,14 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  Image,
 } from 'react-native';
 import {Button} from '../../components/common/Button';
 import {useAuthStore} from '../../stores/authStore';
 import {createApiClient} from '../../api/client';
 import {useTheme} from '../../theme/ThemeContext';
+
+const logo = require('../../assets/logo.png');
 
 export function LoginScreen() {
   const theme = useTheme();
@@ -58,6 +61,7 @@ export function LoginScreen() {
       <ScrollView
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled">
+        <Image source={logo} style={styles.logo} />
         <Text style={[styles.title, {color: theme.primary}]}>FulFill</Text>
         <Text style={[styles.subtitle, {color: theme.textTertiary}]}>
           Connect to your WooCommerce store
@@ -142,6 +146,13 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     padding: 24,
+  },
+  logo: {
+    width: 96,
+    height: 96,
+    borderRadius: 20,
+    alignSelf: 'center',
+    marginBottom: 16,
   },
   title: {
     fontSize: 36,
