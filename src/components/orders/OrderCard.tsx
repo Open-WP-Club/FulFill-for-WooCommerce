@@ -4,6 +4,7 @@ import {Card} from '../common/Card';
 import {StatusBadge} from './StatusBadge';
 import {formatCurrency, formatDate, formatCustomerName} from '../../utils/formatters';
 import {useTheme} from '../../theme/ThemeContext';
+import {copyToClipboard} from '../../utils/clipboard';
 import type {WcOrder} from '../../types/order';
 
 interface OrderCardProps {
@@ -15,7 +16,10 @@ export function OrderCard({order, onPress}: OrderCardProps) {
   const theme = useTheme();
 
   return (
-    <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
+    <TouchableOpacity
+      onPress={onPress}
+      onLongPress={() => copyToClipboard(order.number, `Order #${order.number}`)}
+      activeOpacity={0.7}>
       <Card>
         <View style={styles.header}>
           <Text style={[styles.orderNumber, {color: theme.textPrimary}]}>

@@ -4,6 +4,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import {StockIndicator} from './StockIndicator';
 import {useProductStock} from '../../hooks/useProductStock';
 import {useTheme} from '../../theme/ThemeContext';
+import {copyToClipboard} from '../../utils/clipboard';
 import {ImagePreviewModal} from '../common/ImagePreviewModal';
 import type {PickItem} from '../../types/picking';
 
@@ -46,7 +47,11 @@ export function PickItemRow({item, onMarkMissing, onMarkDamaged}: PickItemRowPro
           {item.name}
         </Text>
         {item.sku ? (
-          <Text style={[styles.sku, {color: theme.textMuted}]}>SKU: {item.sku}</Text>
+          <Text
+            style={[styles.sku, {color: theme.textMuted}]}
+            onLongPress={() => copyToClipboard(item.sku, 'SKU')}>
+            SKU: {item.sku}
+          </Text>
         ) : null}
         <Text style={[styles.quantity, {color: theme.textTertiary}]}>
           {item.pickedQuantity} / {item.quantity}

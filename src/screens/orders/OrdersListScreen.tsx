@@ -20,6 +20,7 @@ export function OrdersListScreen({navigation}: Props) {
     isLoading,
     statusFilter,
     searchQuery,
+    statusCounts,
     refresh,
     loadMore,
     setStatusFilter,
@@ -66,6 +67,7 @@ export function OrdersListScreen({navigation}: Props) {
       <FilterBar
         activeFilter={statusFilter}
         onFilterChange={setStatusFilter}
+        counts={statusCounts}
       />
       {isLoading && orders.length === 0 ? (
         <LoadingSpinner />

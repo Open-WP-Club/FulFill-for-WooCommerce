@@ -44,3 +44,36 @@ export async function updateOrderStatus(
   const response = await client.put<WcOrder>(`/orders/${orderId}`, {status});
   return response.data;
 }
+
+export type StatusCounts = Partial<Record<WcOrderStatus | 'all', number>>;
+
+export async function fetchOrderCounts(): Promise<StatusCounts> {
+  const client = getApiClient();
+  const statuses: WcOrderStatus[] = [
+    'processing',
+    'on-hold',
+    'pending',
+    'completed',
+  ];
+
+  const results = await Promise.all(
+    statuses.map(status =>
+      client
+        .get('/orders', {params: {status, per_page: 1}})
+        .then(res => ({
+          status,
+          count: parseInt(res.headers['x-wp-total'] ?? '0', 10),
+        })),
+    ),
+  );
+
+  const counts: StatusCounts = {};
+  let total = 0;
+  for (const {status, count} of results) {
+    counts[status] = count;
+    total += count;
+  }
+  counts.all = total;
+
+  return counts;
+}

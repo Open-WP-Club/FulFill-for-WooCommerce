@@ -1,7 +1,7 @@
-import {useCallback, useEffect, useRef} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {useOrdersStore} from '../stores/ordersStore';
 import {useSettingsStore} from '../stores/settingsStore';
-import {fetchOrders} from '../api/orders';
+import {fetchOrders, fetchOrderCounts, type StatusCounts} from '../api/orders';
 import type {WcOrderStatus} from '../types/order';
 
 export function useOrders() {
@@ -24,8 +24,18 @@ export function useOrders() {
 
   const pollingIntervalMs = useSettingsStore(s => s.pollingIntervalMs);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [statusCounts, setStatusCounts] = useState<StatusCounts>({});
 
   const ordersList = orderedIds.map(id => orders[id]).filter(Boolean);
+
+  const loadCounts = useCallback(async () => {
+    try {
+      const counts = await fetchOrderCounts();
+      setStatusCounts(counts);
+    } catch {
+      // silently ignore count errors
+    }
+  }, []);
 
   const loadOrders = useCallback(
     async (page: number = 1) => {
@@ -67,7 +77,10 @@ export function useOrders() {
     ],
   );
 
-  const refresh = useCallback(() => loadOrders(1), [loadOrders]);
+  const refresh = useCallback(() => {
+    loadOrders(1);
+    loadCounts();
+  }, [loadOrders, loadCounts]);
 
   const loadMore = useCallback(() => {
     if (!isLoading && currentPage < totalPages) {
@@ -82,6 +95,7 @@ export function useOrders() {
     }
     intervalRef.current = setInterval(() => {
       loadOrders(1);
+      loadCounts();
     }, pollingIntervalMs);
 
     return () => {
@@ -89,7 +103,7 @@ export function useOrders() {
         clearInterval(intervalRef.current);
       }
     };
-  }, [loadOrders, pollingIntervalMs]);
+  }, [loadOrders, loadCounts, pollingIntervalMs]);
 
   return {
     orders: ordersList,
@@ -97,6 +111,7 @@ export function useOrders() {
     error,
     statusFilter,
     searchQuery,
+    statusCounts,
     totalPages,
     currentPage,
     refresh,

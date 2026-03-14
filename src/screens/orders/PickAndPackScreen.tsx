@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {View, FlatList, StyleSheet, Alert} from 'react-native';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {PickItemRow} from '../../components/picking/PickItemRow';
@@ -48,6 +48,7 @@ export function PickAndPackScreen({route, navigation}: Props) {
   }>({visible: false, success: false, message: ''});
 
   const [showScanner, setShowScanner] = useState(false);
+  const autoCompleteShown = useRef(false);
 
   useEffect(() => {
     if (!activeSession || activeSession.orderId !== order.id) {
@@ -138,6 +139,21 @@ export function PickAndPackScreen({route, navigation}: Props) {
       finishOrder();
     }
   }, [isSessionComplete, finishOrder]);
+
+  // Auto-complete prompt when all items are picked
+  useEffect(() => {
+    if (activeSession && isSessionComplete() && !autoCompleteShown.current) {
+      autoCompleteShown.current = true;
+      Alert.alert(
+        'All Items Picked!',
+        'All items have been scanned. Complete this order?',
+        [
+          {text: 'Not Yet', style: 'cancel'},
+          {text: 'Complete', onPress: finishOrder},
+        ],
+      );
+    }
+  }, [activeSession, isSessionComplete, finishOrder]);
 
   const renderItem = useCallback(
     ({item}: {item: PickItem}) => (

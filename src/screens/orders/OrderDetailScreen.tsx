@@ -18,6 +18,7 @@ import {LoadingSpinner} from '../../components/common/LoadingSpinner';
 import {OfflineBanner} from '../../components/common/OfflineBanner';
 import {useOrderDetail} from '../../hooks/useOrderDetail';
 import {useTheme} from '../../theme/ThemeContext';
+import {copyToClipboard} from '../../utils/clipboard';
 import {
   formatCurrency,
   formatDate,
@@ -89,7 +90,9 @@ export function OrderDetailScreen({route, navigation}: Props) {
       <ScrollView contentContainerStyle={styles.content}>
         <Card>
           <View style={styles.headerRow}>
-            <Text style={[styles.orderNumber, {color: theme.textPrimary}]}>
+            <Text
+              style={[styles.orderNumber, {color: theme.textPrimary}]}
+              onLongPress={() => copyToClipboard(order.number, `Order #${order.number}`)}>
               Order #{order.number}
             </Text>
             <StatusBadge status={order.status} />

@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {View, Text, Image, StyleSheet, TouchableOpacity} from 'react-native';
 import {formatCurrency} from '../../utils/formatters';
 import {useTheme} from '../../theme/ThemeContext';
+import {copyToClipboard} from '../../utils/clipboard';
 import {ImagePreviewModal} from '../common/ImagePreviewModal';
 import type {WcLineItem} from '../../types/order';
 
@@ -31,7 +32,9 @@ export function OrderLineItem({item, currency}: OrderLineItemProps) {
           {item.name}
         </Text>
         {item.sku ? (
-          <Text style={[styles.sku, {color: theme.textMuted}]}>
+          <Text
+            style={[styles.sku, {color: theme.textMuted}]}
+            onLongPress={() => copyToClipboard(item.sku, 'SKU')}>
             SKU: {item.sku}
           </Text>
         ) : null}

@@ -42,6 +42,8 @@ jest.mock('react-native-vision-camera', () => ({
 jest.mock('@react-navigation/native', () => ({
   NavigationContainer: ({children}: {children: React.ReactNode}) => children,
   useNavigation: () => ({navigate: jest.fn(), goBack: jest.fn()}),
+  DefaultTheme: {dark: false, colors: {primary: '', background: '', card: '', text: '', border: '', notification: ''}},
+  DarkTheme: {dark: true, colors: {primary: '', background: '', card: '', text: '', border: '', notification: ''}},
 }));
 
 jest.mock('@react-navigation/native-stack', () => ({
@@ -67,6 +69,14 @@ jest.mock('react-native-sound', () => {
   }
   return MockSound;
 });
+
+jest.mock('@react-native-clipboard/clipboard', () => ({
+  __esModule: true,
+  default: {
+    setString: jest.fn(),
+    getString: jest.fn(() => Promise.resolve('')),
+  },
+}));
 
 jest.mock('@notifee/react-native', () => ({
   __esModule: true,
