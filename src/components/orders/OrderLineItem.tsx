@@ -1,7 +1,8 @@
-import React from 'react';
-import {View, Text, Image, StyleSheet} from 'react-native';
+import React, {useState} from 'react';
+import {View, Text, Image, StyleSheet, TouchableOpacity} from 'react-native';
 import {formatCurrency} from '../../utils/formatters';
 import {useTheme} from '../../theme/ThemeContext';
+import {ImagePreviewModal} from '../common/ImagePreviewModal';
 import type {WcLineItem} from '../../types/order';
 
 interface OrderLineItemProps {
@@ -11,11 +12,15 @@ interface OrderLineItemProps {
 
 export function OrderLineItem({item, currency}: OrderLineItemProps) {
   const theme = useTheme();
+  const [previewVisible, setPreviewVisible] = useState(false);
+  const hasImage = !!item.image?.src;
 
   return (
     <View style={[styles.container, {borderBottomColor: theme.borderLight}]}>
-      {item.image?.src ? (
-        <Image source={{uri: item.image.src}} style={styles.image} />
+      {hasImage ? (
+        <TouchableOpacity onPress={() => setPreviewVisible(true)}>
+          <Image source={{uri: item.image!.src}} style={styles.image} />
+        </TouchableOpacity>
       ) : (
         <View
           style={[styles.image, {backgroundColor: theme.surfaceSecondary}]}
@@ -39,6 +44,14 @@ export function OrderLineItem({item, currency}: OrderLineItemProps) {
           </Text>
         </View>
       </View>
+
+      {hasImage && (
+        <ImagePreviewModal
+          visible={previewVisible}
+          imageUri={item.image!.src}
+          onClose={() => setPreviewVisible(false)}
+        />
+      )}
     </View>
   );
 }

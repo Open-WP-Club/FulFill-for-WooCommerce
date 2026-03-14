@@ -1,9 +1,10 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {View, Text, Image, StyleSheet, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {StockIndicator} from './StockIndicator';
 import {useProductStock} from '../../hooks/useProductStock';
 import {useTheme} from '../../theme/ThemeContext';
+import {ImagePreviewModal} from '../common/ImagePreviewModal';
 import type {PickItem} from '../../types/picking';
 
 interface PickItemRowProps {
@@ -14,6 +15,7 @@ interface PickItemRowProps {
 
 export function PickItemRow({item, onMarkMissing, onMarkDamaged}: PickItemRowProps) {
   const theme = useTheme();
+  const [previewVisible, setPreviewVisible] = useState(false);
   const icon = {
     pending: {name: 'radio-button-unchecked', color: theme.textMuted},
     picked: {name: 'check-circle', color: theme.success},
@@ -31,7 +33,9 @@ export function PickItemRow({item, onMarkMissing, onMarkDamaged}: PickItemRowPro
       ]}>
       <Icon name={icon.name} size={24} color={icon.color} />
       {item.imageUrl ? (
-        <Image source={{uri: item.imageUrl}} style={styles.image} />
+        <TouchableOpacity onPress={() => setPreviewVisible(true)}>
+          <Image source={{uri: item.imageUrl}} style={styles.image} />
+        </TouchableOpacity>
       ) : (
         <View
           style={[styles.image, {backgroundColor: theme.surfaceSecondary}]}
@@ -59,6 +63,14 @@ export function PickItemRow({item, onMarkMissing, onMarkDamaged}: PickItemRowPro
           <Icon name="broken-image" size={20} color={theme.error} />
         </TouchableOpacity>
       </View>
+
+      {item.imageUrl && (
+        <ImagePreviewModal
+          visible={previewVisible}
+          imageUri={item.imageUrl}
+          onClose={() => setPreviewVisible(false)}
+        />
+      )}
     </View>
   );
 }
