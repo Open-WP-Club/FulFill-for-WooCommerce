@@ -55,21 +55,21 @@ export function FilterBar({activeFilter, onFilterChange, counts}: FilterBarProps
 
 const styles = StyleSheet.create({
   container: {
-    maxHeight: 48,
+    flexGrow: 0,
   },
   content: {
     paddingHorizontal: 16,
     paddingVertical: 8,
     gap: 8,
+    alignItems: 'center',
   },
   chip: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
     borderRadius: 20,
-    marginRight: 8,
   },
   chipText: {
-    fontSize: 14,
-    fontWeight: '500',
+    fontSize: 13,
+    fontWeight: '600',
   },
 });

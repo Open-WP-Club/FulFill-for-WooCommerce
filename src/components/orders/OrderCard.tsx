@@ -141,10 +141,15 @@ export function OrderCard({
             </View>
             <StatusBadge status={order.status} />
           </View>
-          <Text style={[styles.customer, {color: theme.textSecondary}]}>
-            {formatCustomerName(order.billing)}
-          </Text>
-          <View style={styles.footer}>
+          <View style={styles.row}>
+            <Text style={[styles.customer, {color: theme.textSecondary}]}>
+              {formatCustomerName(order.billing)}
+            </Text>
+            <Text style={[styles.meta, {color: theme.textMuted}]}>
+              {order.line_items.length} item{order.line_items.length !== 1 ? 's' : ''}
+            </Text>
+          </View>
+          <View style={styles.row}>
             <Text style={[styles.date, {color: theme.textMuted}]}>
               {formatDate(order.date_created)}
             </Text>
@@ -152,9 +157,6 @@ export function OrderCard({
               {formatCurrency(order.total, order.currency)}
             </Text>
           </View>
-          <Text style={[styles.items, {color: theme.textMuted}]}>
-            {order.line_items.length} item{order.line_items.length !== 1 ? 's' : ''}
-          </Text>
         </Card>
       </TouchableOpacity>
     </Swipeable>
@@ -166,7 +168,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 4,
   },
   headerLeft: {
     flexDirection: 'row',
@@ -176,28 +178,27 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   orderNumber: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '700',
   },
-  customer: {
-    fontSize: 15,
-    marginBottom: 8,
-  },
-  footer: {
+  row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginTop: 2,
+  },
+  customer: {
+    fontSize: 14,
+  },
+  meta: {
+    fontSize: 13,
   },
   date: {
-    fontSize: 13,
+    fontSize: 12,
   },
   total: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
-  },
-  items: {
-    fontSize: 13,
-    marginTop: 4,
   },
   swipeAction: {
     justifyContent: 'center',
