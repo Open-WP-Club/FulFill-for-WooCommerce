@@ -5,9 +5,6 @@ on:
     tags:
       - '*'
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 jobs:
   build:
     name: Build Release APK
@@ -15,10 +12,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
@@ -27,26 +24,25 @@ jobs:
         run: npm ci
 
       - name: Set up JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: zulu
           java-version: 21
           cache: gradle
-
-      - name: Cache Android SDK/NDK
-        uses: actions/cache@v4
-        with:
-          path: |
-            /usr/local/lib/android/sdk/ndk
-            /usr/local/lib/android/sdk/build-tools
-          key: android-sdk-${{ runner.os }}-ndk27
 
       - name: Make gradlew executable
         run: chmod +x android/gradlew
 
       - name: Build Release APK
         working-directory: android
-        run: ./gradlew assembleRelease --no-daemon --build-cache
+        run: |
+          ./gradlew assembleRelease \
+            --build-cache \
+            --parallel \
+            -PreactNativeArchitectures=arm64-v8a \
+            -x lintVitalAnalyzeRelease \
+            -x lintVitalReportRelease \
+            -x lintVitalRelease
 
       - name: Rename APK with tag version
         run: |
@@ -55,7 +51,7 @@ jobs:
              android/app/build/outputs/apk/release/FulFill-${TAG}.apk
 
       - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: FulFill-${{ github.ref_name }}
           path: android/app/build/outputs/apk/release/FulFill-*.apk
