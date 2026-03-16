@@ -36,6 +36,7 @@ jest.mock('@react-native-community/netinfo', () => ({
 jest.mock('react-native-vision-camera', () => ({
   Camera: 'Camera',
   useCameraDevice: jest.fn(() => ({id: 'back'})),
+  useCameraPermission: jest.fn(() => ({hasPermission: true, requestPermission: jest.fn(() => Promise.resolve(true))})),
   useCodeScanner: jest.fn(() => ({})),
 }));
 
@@ -84,8 +85,26 @@ jest.mock('@notifee/react-native', () => ({
     requestPermission: jest.fn(() => Promise.resolve()),
     createChannel: jest.fn(() => Promise.resolve()),
     displayNotification: jest.fn(() => Promise.resolve()),
+    createTriggerNotification: jest.fn(() => Promise.resolve()),
+    getTriggerNotificationIds: jest.fn(() => Promise.resolve([])),
+    cancelTriggerNotification: jest.fn(() => Promise.resolve()),
   },
-  AndroidImportance: {HIGH: 4},
+  AndroidImportance: {HIGH: 4, DEFAULT: 3},
+  TriggerType: {TIMESTAMP: 0},
+  RepeatFrequency: {DAILY: 3},
+}));
+
+jest.mock('react-native-shake', () => ({
+  __esModule: true,
+  default: {
+    addListener: jest.fn(() => ({remove: jest.fn()})),
+  },
+}));
+
+jest.mock('react-native-volume-manager', () => ({
+  VolumeManager: {
+    addVolumeListener: jest.fn(() => ({remove: jest.fn()})),
+  },
 }));
 
 import React from 'react';

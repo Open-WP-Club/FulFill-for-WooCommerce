@@ -59,4 +59,15 @@ describe('settingsStore', () => {
     useSettingsStore.getState().setLowStockThreshold(10);
     expect(useSettingsStore.getState().lowStockThreshold).toBe(10);
   });
+
+  it('has daily summary disabled by default', () => {
+    expect(useSettingsStore.getState().dailySummaryEnabled).toBe(false);
+  });
+
+  it('toggles daily summary', () => {
+    useSettingsStore.getState().setDailySummaryEnabled(true);
+    expect(useSettingsStore.getState().dailySummaryEnabled).toBe(true);
+    useSettingsStore.getState().setDailySummaryEnabled(false);
+    expect(useSettingsStore.getState().dailySummaryEnabled).toBe(false);
+  });
 });
