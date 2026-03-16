@@ -25,6 +25,7 @@ import {
   formatAddress,
   formatCustomerName,
 } from '../../utils/formatters';
+import {playStatusFeedback} from '../../utils/feedback';
 import type {OrdersStackParamList} from '../../types/navigation';
 import type {WcOrderStatus} from '../../types/order';
 
@@ -54,7 +55,10 @@ export function OrderDetailScreen({route, navigation}: Props) {
           {text: 'Cancel', style: 'cancel'},
           {
             text: 'Confirm',
-            onPress: () => changeStatus(status),
+            onPress: () => {
+              changeStatus(status);
+              playStatusFeedback(status);
+            },
           },
         ],
       );

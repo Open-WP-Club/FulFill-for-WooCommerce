@@ -10,17 +10,37 @@ import {Button} from '../../components/common/Button';
 import {usePickingStore} from '../../stores/pickingStore';
 import {useOrderDetail} from '../../hooks/useOrderDetail';
 import {useBarcodeScanner} from '../../hooks/useBarcodeScanner';
+import {useVolumeScanner} from '../../hooks/useVolumeScanner';
 import {matchBarcodeToLineItem, isToteBarcode} from '../../utils/barcode';
-import {playSuccessFeedback, playErrorFeedback} from '../../utils/feedback';
+import {playSuccessFeedback, playErrorFeedback, playStatusFeedback} from '../../utils/feedback';
 import {useToteStore} from '../../stores/toteStore';
 import {useAnalyticsStore} from '../../stores/analyticsStore';
+import {useOrdersStore} from '../../stores/ordersStore';
 import {ToteBadge} from '../../components/picking/ToteBadge';
 import {ToteScanModal} from '../../components/picking/ToteScanModal';
 import {useTheme} from '../../theme/ThemeContext';
 import type {OrdersStackParamList} from '../../types/navigation';
 import type {PickItem} from '../../types/picking';
+import type {WcOrder} from '../../types/order';
 
 type Props = NativeStackScreenProps<OrdersStackParamList, 'PickAndPack'>;
+
+function findNextPendingOrder(
+  currentOrderId: number,
+  orders: Record<number, WcOrder>,
+  orderedIds: number[],
+): WcOrder | null {
+  for (const id of orderedIds) {
+    if (id === currentOrderId) {
+      continue;
+    }
+    const o = orders[id];
+    if (o && (o.status === 'processing' || o.status === 'pending')) {
+      return o;
+    }
+  }
+  return null;
+}
 
 export function PickAndPackScreen({route, navigation}: Props) {
   const theme = useTheme();
@@ -34,6 +54,9 @@ export function PickAndPackScreen({route, navigation}: Props) {
     updateItemStatus,
     isSessionComplete,
   } = usePickingStore();
+
+  const ordersMap = useOrdersStore(s => s.orders);
+  const orderedIds = useOrdersStore(s => s.orderedIds);
 
   const toteAssignment = useToteStore(s => s.assignments[order.id]);
   const assignTote = useToteStore(s => s.assignTote);
@@ -95,8 +118,19 @@ export function PickAndPackScreen({route, navigation}: Props) {
     [activeSession, order.line_items, order.id, order.number, incrementPicked, assignTote],
   );
 
-  const {isActive, handleCodeScanned} = useBarcodeScanner({
+  const {isActive, handleCodeScanned, resetScanner} = useBarcodeScanner({
     onScan: handleScan,
+  });
+
+  // Volume button triggers scanner activation
+  useVolumeScanner({
+    onTrigger: useCallback(() => {
+      if (!showScanner) {
+        setShowScanner(true);
+      }
+      resetScanner();
+    }, [showScanner, resetScanner]),
+    enabled: true,
   });
 
   const finishOrder = useCallback(() => {
@@ -120,40 +154,75 @@ export function PickAndPackScreen({route, navigation}: Props) {
       });
     }
     changeStatus('completed');
+    playStatusFeedback('completed');
     endSession();
     clearAssignment(order.id);
-    navigation.goBack();
-  }, [activeSession, order, changeStatus, endSession, clearAssignment, recordSession, navigation]);
+    return true;
+  }, [activeSession, order, changeStatus, endSession, clearAssignment, recordSession]);
+
+  const advanceToNextOrder = useCallback(() => {
+    const next = findNextPendingOrder(order.id, ordersMap, orderedIds);
+    if (next) {
+      Alert.alert(
+        'Next Order',
+        `Advance to order #${next.number}?`,
+        [
+          {
+            text: 'Back to List',
+            style: 'cancel',
+            onPress: () => navigation.goBack(),
+          },
+          {
+            text: 'Next Order',
+            onPress: () => {
+              navigation.replace('PickAndPack', {order: next});
+            },
+          },
+        ],
+      );
+    } else {
+      navigation.goBack();
+    }
+  }, [order.id, ordersMap, orderedIds, navigation]);
 
   const handleComplete = useCallback(() => {
+    const doFinish = () => {
+      finishOrder();
+      advanceToNextOrder();
+    };
+
     if (!isSessionComplete()) {
       Alert.alert(
         'Incomplete',
         'Not all items have been picked. Complete anyway?',
         [
           {text: 'Cancel', style: 'cancel'},
-          {text: 'Complete', onPress: finishOrder},
+          {text: 'Complete', onPress: doFinish},
         ],
       );
     } else {
-      finishOrder();
+      doFinish();
     }
-  }, [isSessionComplete, finishOrder]);
+  }, [isSessionComplete, finishOrder, advanceToNextOrder]);
 
   // Auto-complete prompt when all items are picked
   useEffect(() => {
     if (activeSession && isSessionComplete() && !autoCompleteShown.current) {
       autoCompleteShown.current = true;
+      const doFinish = () => {
+        finishOrder();
+        advanceToNextOrder();
+      };
       Alert.alert(
         'All Items Picked!',
         'All items have been scanned. Complete this order?',
         [
           {text: 'Not Yet', style: 'cancel'},
-          {text: 'Complete', onPress: finishOrder},
+          {text: 'Complete', onPress: doFinish},
         ],
       );
     }
-  }, [activeSession, isSessionComplete, finishOrder]);
+  }, [activeSession, isSessionComplete, finishOrder, advanceToNextOrder]);
 
   const renderItem = useCallback(
     ({item}: {item: PickItem}) => (

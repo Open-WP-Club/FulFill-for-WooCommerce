@@ -9,6 +9,7 @@ interface SettingsState {
   autoSyncEnabled: boolean;
   pollingIntervalMs: number;
   notificationsEnabled: boolean;
+  dailySummaryEnabled: boolean;
   lowStockThreshold: number;
   themeMode: ThemeMode;
 
@@ -17,6 +18,7 @@ interface SettingsState {
   setAutoSyncEnabled: (enabled: boolean) => void;
   setPollingInterval: (ms: number) => void;
   setNotificationsEnabled: (enabled: boolean) => void;
+  setDailySummaryEnabled: (enabled: boolean) => void;
   setLowStockThreshold: (n: number) => void;
   setThemeMode: (mode: ThemeMode) => void;
 }
@@ -29,6 +31,7 @@ export const useSettingsStore = create<SettingsState>()(
       autoSyncEnabled: true,
       pollingIntervalMs: 30000,
       notificationsEnabled: true,
+      dailySummaryEnabled: false,
       lowStockThreshold: 5,
       themeMode: 'system' as ThemeMode,
 
@@ -37,6 +40,7 @@ export const useSettingsStore = create<SettingsState>()(
       setAutoSyncEnabled: enabled => set({autoSyncEnabled: enabled}),
       setPollingInterval: ms => set({pollingIntervalMs: ms}),
       setNotificationsEnabled: enabled => set({notificationsEnabled: enabled}),
+      setDailySummaryEnabled: enabled => set({dailySummaryEnabled: enabled}),
       setLowStockThreshold: n => set({lowStockThreshold: n}),
       setThemeMode: mode => set({themeMode: mode}),
     }),

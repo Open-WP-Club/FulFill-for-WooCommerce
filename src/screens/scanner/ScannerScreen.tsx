@@ -22,6 +22,7 @@ import {
   useScanHistoryStore,
   type ScanHistoryEntry,
 } from '../../stores/scanHistoryStore';
+import {exportScanHistory} from '../../utils/exportCsv';
 import type {WcProduct} from '../../types/product';
 import {format} from 'date-fns';
 
@@ -142,11 +143,19 @@ export function ScannerScreen() {
                 Scan History
               </Text>
               {entries.length > 0 && (
-                <TouchableOpacity onPress={clearHistory}>
-                  <Text style={[styles.clearBtn, {color: theme.error}]}>
-                    Clear
-                  </Text>
-                </TouchableOpacity>
+                <View style={styles.historyActions}>
+                  <TouchableOpacity
+                    onPress={() => exportScanHistory(entries)}>
+                    <Text style={[styles.exportBtn, {color: theme.primary}]}>
+                      Export
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={clearHistory}>
+                    <Text style={[styles.clearBtn, {color: theme.error}]}>
+                      Clear
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               )}
             </View>
             {entries.length === 0 ? (
@@ -317,6 +326,14 @@ const styles = StyleSheet.create({
   historyTitle: {
     fontSize: 16,
     fontWeight: '700',
+  },
+  historyActions: {
+    flexDirection: 'row',
+    gap: 16,
+  },
+  exportBtn: {
+    fontSize: 14,
+    fontWeight: '600',
   },
   clearBtn: {
     fontSize: 14,

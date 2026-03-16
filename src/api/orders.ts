@@ -45,6 +45,19 @@ export async function updateOrderStatus(
   return response.data;
 }
 
+export async function batchUpdateOrderStatus(
+  orderIds: number[],
+  status: WcOrderStatus,
+): Promise<WcOrder[]> {
+  const client = getApiClient();
+  const results = await Promise.all(
+    orderIds.map(id =>
+      client.put<WcOrder>(`/orders/${id}`, {status}).then(r => r.data),
+    ),
+  );
+  return results;
+}
+
 export type StatusCounts = Partial<Record<WcOrderStatus | 'all', number>>;
 
 export async function fetchOrderCounts(): Promise<StatusCounts> {

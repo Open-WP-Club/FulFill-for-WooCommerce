@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {View, Text, StyleSheet, Switch, ScrollView, Alert, TouchableOpacity} from 'react-native';
 import {Card} from '../../components/common/Card';
 import {Button} from '../../components/common/Button';
@@ -7,6 +7,7 @@ import {useSettingsStore} from '../../stores/settingsStore';
 import {useSyncStore} from '../../stores/syncStore';
 import {useSync} from '../../hooks/useSync';
 import {useTheme} from '../../theme/ThemeContext';
+import {scheduleDailySummary, cancelDailySummary} from '../../utils/localNotifications';
 import type {ThemeMode} from '../../theme/colors';
 
 const THEME_OPTIONS: Array<{label: string; value: ThemeMode}> = [
@@ -24,15 +25,26 @@ export function SettingsScreen() {
     hapticEnabled,
     autoSyncEnabled,
     notificationsEnabled,
+    dailySummaryEnabled,
     lowStockThreshold,
     themeMode,
     setSoundEnabled,
     setHapticEnabled,
     setAutoSyncEnabled,
     setNotificationsEnabled,
+    setDailySummaryEnabled,
     setLowStockThreshold,
     setThemeMode,
   } = useSettingsStore();
+
+  // Schedule/cancel daily summary when setting changes
+  useEffect(() => {
+    if (dailySummaryEnabled) {
+      scheduleDailySummary(8);
+    } else {
+      cancelDailySummary();
+    }
+  }, [dailySummaryEnabled]);
   const clearQueue = useSyncStore(s => s.clearQueue);
   const {pendingCount, isSyncing, lastSyncAt, isConnected} = useSync();
 
@@ -140,6 +152,15 @@ export function SettingsScreen() {
           <Switch
             value={notificationsEnabled}
             onValueChange={setNotificationsEnabled}
+          />
+        </View>
+        <View style={styles.switchRow}>
+          <Text style={[styles.label, {color: theme.textSecondary}]}>
+            Daily summary (8:00 AM)
+          </Text>
+          <Switch
+            value={dailySummaryEnabled}
+            onValueChange={setDailySummaryEnabled}
           />
         </View>
       </Card>
