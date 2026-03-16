@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/logos/logo-b-warehouse.svg" width="128" height="128" alt="FulFill logo" />
+  <img src="assets/logo.svg" width="128" height="128" alt="FulFill logo" />
 </p>
 
 <h1 align="center">FulFill for WooCommerce</h1>
