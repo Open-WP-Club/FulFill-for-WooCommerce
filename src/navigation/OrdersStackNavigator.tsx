@@ -3,6 +3,7 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {OrdersListScreen} from '../screens/orders/OrdersListScreen';
 import {OrderDetailScreen} from '../screens/orders/OrderDetailScreen';
 import {PickAndPackScreen} from '../screens/orders/PickAndPackScreen';
+import {WavePickScreen} from '../screens/orders/WavePickScreen';
 import {useTheme} from '../theme/ThemeContext';
 import type {OrdersStackParamList} from '../types/navigation';
 
@@ -32,6 +33,11 @@ export function OrdersStackNavigator() {
         name="PickAndPack"
         component={PickAndPackScreen}
         options={{title: 'Pick & Pack'}}
+      />
+      <Stack.Screen
+        name="WavePick"
+        component={WavePickScreen}
+        options={{title: 'Wave Pick'}}
       />
     </Stack.Navigator>
   );

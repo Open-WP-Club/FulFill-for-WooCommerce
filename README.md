@@ -32,6 +32,8 @@
 ### Pick & Pack
 
 - **Pick & Pack** — Per-order picking workflow with inline scanner. Track picked/missing/damaged items with progress bar.
+- **Wave Picking** — Consolidates multiple orders into a single pick list grouped by SKU. Reduces warehouse walks by picking each product once for all orders.
+- **Priority Queue** — Automatic order scoring based on age, shipping method, value, and customer notes. Toggle priority sort to surface urgent orders first.
 - **Auto-Advance** — After completing an order, the app offers to open the next pending/processing order automatically.
 - **Volume Button Scanner** — Press any volume button to activate/reset the barcode scanner during picking (hands-free scanning).
 
@@ -83,3 +85,5 @@ npx react-native run-android
 - **Pick sessions not persisted** — Fresh start on app restart for accuracy (v1)
 - **Status-specific haptics** — Different vibration patterns per order status for tactile awareness
 - **Auto-advance picking** — Reduces manual navigation between orders during high-volume fulfillment
+- **Wave picking** — Greedy SKU-overlap grouping algorithm; picker visits each bin once for multiple orders
+- **Priority scoring** — Weighted formula: age (0-40) + shipping method (0-30) + value (0-15) + note (0-10) + status (0-5)

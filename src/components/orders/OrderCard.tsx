@@ -7,6 +7,8 @@ import {StatusBadge} from './StatusBadge';
 import {formatCurrency, formatDate, formatCustomerName} from '../../utils/formatters';
 import {useTheme} from '../../theme/ThemeContext';
 import {copyToClipboard} from '../../utils/clipboard';
+import {PriorityIndicator} from './PriorityIndicator';
+import {computeOrderPriority} from '../../utils/priority';
 import type {WcOrder} from '../../types/order';
 
 interface OrderCardProps {
@@ -91,6 +93,8 @@ export function OrderCard({
     [onComplete, order.status],
   );
 
+  const priority = computeOrderPriority(order);
+
   const handlePress = useCallback(() => {
     if (selectMode && onToggleSelect) {
       onToggleSelect();
@@ -138,6 +142,7 @@ export function OrderCard({
               <Text style={[styles.orderNumber, {color: theme.textPrimary}]}>
                 #{order.number}
               </Text>
+              <PriorityIndicator level={priority.level} />
             </View>
             <StatusBadge status={order.status} />
           </View>

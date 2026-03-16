@@ -16,4 +16,5 @@ export type OrdersStackParamList = {
   OrdersList: undefined;
   OrderDetail: {orderId: number};
   PickAndPack: {order: WcOrder};
+  WavePick: {orders: WcOrder[]};
 };

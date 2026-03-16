@@ -1,4 +1,4 @@
-import React, {useEffect, useCallback, useState, useRef} from 'react';
+import React, {useEffect, useCallback, useState, useRef, useMemo} from 'react';
 import {View, FlatList, StyleSheet, TextInput, Alert, TouchableOpacity, Text} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -14,6 +14,8 @@ import {batchUpdateOrderStatus} from '../../api/orders';
 import {playStatusFeedback} from '../../utils/feedback';
 import {useOrdersStore} from '../../stores/ordersStore';
 import type {OrdersStackParamList} from '../../types/navigation';
+import {sortOrdersByPriority} from '../../utils/priority';
+import {suggestWaves} from '../../utils/wavePicking';
 import type {WcOrder, WcOrderStatus} from '../../types/order';
 
 type Props = NativeStackScreenProps<OrdersStackParamList, 'OrdersList'>;
@@ -43,9 +45,38 @@ export function OrdersListScreen({navigation}: Props) {
 
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [batchLoading, setBatchLoading] = useState(false);
+  const [prioritySort, setPrioritySort] = useState(false);
   const lastBatchRef = useRef<{ids: number[]; previousStatuses: Map<number, WcOrderStatus>} | null>(null);
 
   const selectMode = selectedIds.size > 0;
+
+  const sortedOrders = useMemo(
+    () => (prioritySort ? sortOrdersByPriority(orders) : orders),
+    [orders, prioritySort],
+  );
+
+  const handleStartWave = useCallback(() => {
+    // Use selected orders if any, otherwise use actionable orders
+    const waveOrders = selectMode
+      ? orders.filter(o => selectedIds.has(o.id))
+      : orders.filter(
+          o => o.status === 'processing' || o.status === 'pending',
+        );
+
+    if (waveOrders.length < 2) {
+      Alert.alert(
+        'Wave Pick',
+        'Select at least 2 orders for wave picking, or ensure there are 2+ processing/pending orders.',
+      );
+      return;
+    }
+
+    const waves = suggestWaves(waveOrders);
+    if (waves.length > 0) {
+      setSelectedIds(new Set());
+      navigation.navigate('WavePick', {orders: waves[0].orders});
+    }
+  }, [selectMode, orders, selectedIds, navigation]);
 
   useEffect(() => {
     refresh();
@@ -249,11 +280,32 @@ export function OrdersListScreen({navigation}: Props) {
         onChangeText={setSearchQuery}
         returnKeyType="search"
       />
-      <FilterBar
-        activeFilter={statusFilter}
-        onFilterChange={setStatusFilter}
-        counts={statusCounts}
-      />
+      <View style={styles.toolbar}>
+        <FilterBar
+          activeFilter={statusFilter}
+          onFilterChange={setStatusFilter}
+          counts={statusCounts}
+        />
+        <View style={styles.toolbarActions}>
+          <TouchableOpacity
+            style={[
+              styles.toolBtn,
+              {backgroundColor: prioritySort ? theme.primary : theme.surfaceSecondary},
+            ]}
+            onPress={() => setPrioritySort(p => !p)}>
+            <Icon
+              name="sort"
+              size={18}
+              color={prioritySort ? theme.textOnPrimary : theme.textTertiary}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.toolBtn, {backgroundColor: theme.surfaceSecondary}]}
+            onPress={handleStartWave}>
+            <Icon name="layers" size={18} color={theme.textTertiary} />
+          </TouchableOpacity>
+        </View>
+      </View>
       {isLoading && orders.length === 0 ? (
         <LoadingSpinner />
       ) : orders.length === 0 ? (
@@ -264,7 +316,7 @@ export function OrdersListScreen({navigation}: Props) {
         />
       ) : (
         <FlatList
-          data={orders}
+          data={sortedOrders}
           renderItem={renderItem}
           keyExtractor={item => item.id.toString()}
           onRefresh={refresh}
@@ -326,6 +378,23 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  toolbar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingRight: 12,
+  },
+  toolbarActions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  toolBtn: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
     justifyContent: 'center',
     alignItems: 'center',
   },
