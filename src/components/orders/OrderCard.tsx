@@ -1,6 +1,9 @@
 import React, {useCallback, useRef} from 'react';
-import {TouchableOpacity, View, Text, StyleSheet, Animated} from 'react-native';
-import {Swipeable} from 'react-native-gesture-handler';
+import {TouchableOpacity, View, Text, StyleSheet} from 'react-native';
+import Animated, {interpolate, useAnimatedStyle} from 'react-native-reanimated';
+import type {SharedValue} from 'react-native-reanimated';
+import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
+import type {SwipeableMethods} from 'react-native-gesture-handler/ReanimatedSwipeable';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {Card} from '../common/Card';
 import {StatusBadge} from './StatusBadge';
@@ -20,6 +23,52 @@ interface OrderCardProps {
   selectMode?: boolean;
 }
 
+function RightAction({
+  dragX,
+  onPress,
+}: {
+  dragX: SharedValue<number>;
+  onPress: () => void;
+}) {
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [
+      {scale: interpolate(dragX.value, [-80, 0], [1, 0.5], 'clamp')},
+    ],
+  }));
+  return (
+    <TouchableOpacity style={styles.swipeAction} onPress={onPress}>
+      <Animated.View style={[styles.swipeContent, animatedStyle]}>
+        <Icon name="visibility" size={22} color="#fff" />
+        <Text style={styles.swipeText}>View</Text>
+      </Animated.View>
+    </TouchableOpacity>
+  );
+}
+
+function LeftAction({
+  dragX,
+  onPress,
+}: {
+  dragX: SharedValue<number>;
+  onPress: () => void;
+}) {
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [
+      {scale: interpolate(dragX.value, [0, 80], [0.5, 1], 'clamp')},
+    ],
+  }));
+  return (
+    <TouchableOpacity
+      style={[styles.swipeAction, styles.swipeComplete]}
+      onPress={onPress}>
+      <Animated.View style={[styles.swipeContent, animatedStyle]}>
+        <Icon name="check-circle" size={22} color="#fff" />
+        <Text style={styles.swipeText}>Complete</Text>
+      </Animated.View>
+    </TouchableOpacity>
+  );
+}
+
 export function OrderCard({
   order,
   onPress,
@@ -29,65 +78,34 @@ export function OrderCard({
   selectMode = false,
 }: OrderCardProps) {
   const theme = useTheme();
-  const swipeableRef = useRef<Swipeable>(null);
+  const swipeableRef = useRef<SwipeableMethods>(null);
 
   const renderRightActions = useCallback(
-    (
-      _progress: Animated.AnimatedInterpolation<number>,
-      dragX: Animated.AnimatedInterpolation<number>,
-    ) => {
-      const scale = dragX.interpolate({
-        inputRange: [-80, 0],
-        outputRange: [1, 0.5],
-        extrapolate: 'clamp',
-      });
-
-      return (
-        <TouchableOpacity
-          style={styles.swipeAction}
-          onPress={() => {
-            swipeableRef.current?.close();
-            onPress();
-          }}>
-          <Animated.View
-            style={[styles.swipeContent, {transform: [{scale}]}]}>
-            <Icon name="visibility" size={22} color="#fff" />
-            <Text style={styles.swipeText}>View</Text>
-          </Animated.View>
-        </TouchableOpacity>
-      );
-    },
+    (_progress: SharedValue<number>, dragX: SharedValue<number>) => (
+      <RightAction
+        dragX={dragX}
+        onPress={() => {
+          swipeableRef.current?.close();
+          onPress();
+        }}
+      />
+    ),
     [onPress],
   );
 
   const renderLeftActions = useCallback(
-    (
-      _progress: Animated.AnimatedInterpolation<number>,
-      dragX: Animated.AnimatedInterpolation<number>,
-    ) => {
+    (_progress: SharedValue<number>, dragX: SharedValue<number>) => {
       if (!onComplete || order.status === 'completed') {
         return null;
       }
-
-      const scale = dragX.interpolate({
-        inputRange: [0, 80],
-        outputRange: [0.5, 1],
-        extrapolate: 'clamp',
-      });
-
       return (
-        <TouchableOpacity
-          style={[styles.swipeAction, styles.swipeComplete]}
+        <LeftAction
+          dragX={dragX}
           onPress={() => {
             swipeableRef.current?.close();
             onComplete();
-          }}>
-          <Animated.View
-            style={[styles.swipeContent, {transform: [{scale}]}]}>
-            <Icon name="check-circle" size={22} color="#fff" />
-            <Text style={styles.swipeText}>Complete</Text>
-          </Animated.View>
-        </TouchableOpacity>
+          }}
+        />
       );
     },
     [onComplete, order.status],
