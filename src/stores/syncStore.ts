@@ -50,24 +50,29 @@ export const useSyncStore = create<SyncStoreState>()(
 
         set({isSyncing: true});
 
-        const updatedQueue = [...queue];
-        const toRemove: string[] = [];
+        const toRemove = new Set<string>();
+        const retryIncrements = new Map<string, number>();
 
-        for (const mutation of updatedQueue) {
+        for (const mutation of queue) {
           try {
             await executeMutation(mutation);
-            toRemove.push(mutation.id);
+            toRemove.add(mutation.id);
           } catch {
-            mutation.retryCount += 1;
-            if (mutation.retryCount >= mutation.maxRetries) {
-              mutation.lastError = 'Max retries exceeded';
-              toRemove.push(mutation.id);
+            const nextRetry = (mutation.retryCount ?? 0) + 1;
+            retryIncrements.set(mutation.id, nextRetry);
+            if (nextRetry >= mutation.maxRetries) {
+              toRemove.add(mutation.id);
             }
           }
         }
 
         set(state => ({
-          queue: state.queue.filter(m => !toRemove.includes(m.id)),
+          queue: state.queue
+            .filter(m => !toRemove.has(m.id))
+            .map(m => {
+              const nextRetry = retryIncrements.get(m.id);
+              return nextRetry !== undefined ? {...m, retryCount: nextRetry} : m;
+            }),
           isSyncing: false,
           lastSyncAt: new Date().toISOString(),
         }));

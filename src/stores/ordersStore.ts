@@ -63,10 +63,12 @@ export const useOrdersStore = create<OrdersState>()(
       appendOrders: (orders, page) => {
         set(state => {
           const updatedOrders = {...state.orders};
+          const existingIds = new Set(state.orderedIds);
           const newIds = [...state.orderedIds];
           for (const order of orders) {
             updatedOrders[order.id] = order;
-            if (!newIds.includes(order.id)) {
+            if (!existingIds.has(order.id)) {
+              existingIds.add(order.id);
               newIds.push(order.id);
             }
           }

@@ -32,19 +32,36 @@ export function LoginScreen() {
       return;
     }
 
-    const urlPattern = /^https?:\/\/.+\..+/;
-    if (!urlPattern.test(siteUrl.trim())) {
+    const trimmedUrl = siteUrl.trim();
+    const httpsPattern = /^https:\/\/.+\..+/;
+    const httpPattern = /^http:\/\/.+\..+/;
+    if (httpsPattern.test(trimmedUrl)) {
+      // valid
+    } else if (httpPattern.test(trimmedUrl)) {
+      Alert.alert(
+        'Insecure Connection',
+        'Your store URL uses HTTP. API credentials will be sent unencrypted. Use HTTPS for security.',
+        [
+          {text: 'Cancel', style: 'cancel'},
+          {text: 'Continue Anyway', onPress: () => doLogin(trimmedUrl)},
+        ],
+      );
+      return;
+    } else {
       Alert.alert('Error', 'Please enter a valid URL (e.g. https://yourstore.com)');
       return;
     }
 
+    await doLogin(trimmedUrl);
+  };
+
+  const doLogin = async (trimmedUrl: string) => {
     setLoading(true);
     try {
-      login(siteUrl.trim(), consumerKey.trim(), consumerSecret.trim());
-      const client = createApiClient();
+      const client = createApiClient(trimmedUrl, consumerKey.trim(), consumerSecret.trim());
       await client.get('/orders', {params: {per_page: 1}});
+      login(trimmedUrl, consumerKey.trim(), consumerSecret.trim());
     } catch {
-      useAuthStore.getState().logout();
       Alert.alert(
         'Connection Failed',
         'Could not connect to WooCommerce. Please check your URL and API keys.',
