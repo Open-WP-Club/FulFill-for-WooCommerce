@@ -1,10 +1,10 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
-import Icon from '@react-native-vector-icons/material-icons';
+import Icon, {type MaterialIconsIconName} from '@react-native-vector-icons/material-icons';
 import {useTheme} from '../../theme/ThemeContext';
 
 interface EmptyStateProps {
-  icon: string;
+  icon: MaterialIconsIconName;
   title: string;
   message?: string;
 }

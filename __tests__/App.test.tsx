@@ -36,7 +36,7 @@ jest.mock('react-native-mmkv', () => {
   };
 });
 
-jest.mock('react-native-vector-icons/MaterialIcons', () => 'Icon');
+jest.mock('@react-native-vector-icons/material-icons', () => 'Icon');
 
 jest.mock('@react-native-community/netinfo', () => ({
   addEventListener: jest.fn(() => jest.fn()),

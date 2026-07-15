@@ -18,10 +18,10 @@ export function PickItemRow({item, onMarkMissing, onMarkDamaged}: PickItemRowPro
   const theme = useTheme();
   const [previewVisible, setPreviewVisible] = useState(false);
   const icon = {
-    pending: {name: 'radio-button-unchecked', color: theme.textMuted},
-    picked: {name: 'check-circle', color: theme.success},
-    missing: {name: 'error', color: theme.warning},
-    damaged: {name: 'broken-image', color: theme.error},
+    pending: {name: 'radio-button-unchecked' as const, color: theme.textMuted},
+    picked: {name: 'check-circle' as const, color: theme.success},
+    missing: {name: 'error' as const, color: theme.warning},
+    damaged: {name: 'broken-image' as const, color: theme.error},
   }[item.status];
   const {stockQuantity, stockStatus, isLoading} = useProductStock(item.productId);
 

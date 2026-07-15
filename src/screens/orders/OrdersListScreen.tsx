@@ -1,6 +1,6 @@
 import React, {useEffect, useCallback, useState, useRef, useMemo} from 'react';
 import {View, FlatList, StyleSheet, TextInput, Alert, TouchableOpacity, Text} from 'react-native';
-import Icon from '@react-native-vector-icons/material-icons';
+import Icon, {type MaterialIconsIconName} from '@react-native-vector-icons/material-icons';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {OrderCard} from '../../components/orders/OrderCard';
 import {FilterBar} from '../../components/orders/FilterBar';
@@ -20,7 +20,7 @@ import type {WcOrder, WcOrderStatus} from '../../types/order';
 
 type Props = NativeStackScreenProps<OrdersStackParamList, 'OrdersList'>;
 
-const BATCH_ACTIONS: Array<{label: string; status: WcOrderStatus; icon: string}> = [
+const BATCH_ACTIONS: Array<{label: string; status: WcOrderStatus; icon: MaterialIconsIconName}> = [
   {label: 'Processing', status: 'processing', icon: 'autorenew'},
   {label: 'Complete', status: 'completed', icon: 'check-circle'},
   {label: 'On Hold', status: 'on-hold', icon: 'pause-circle-filled'},

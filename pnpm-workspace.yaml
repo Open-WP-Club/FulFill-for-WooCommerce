@@ -1,2 +1,8 @@
 allowBuilds:
   unrs-resolver: true
+
+overrides:
+  jest-environment-node: "^30"
+  jest-mock: "^30"
+  babel-jest: "^30"
+  babel-preset-jest: "^30"

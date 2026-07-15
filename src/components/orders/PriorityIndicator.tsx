@@ -1,6 +1,6 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
-import Icon from '@react-native-vector-icons/material-icons';
+import Icon, {type MaterialIconsIconName} from '@react-native-vector-icons/material-icons';
 import type {PriorityLevel} from '../../utils/priority';
 import {PRIORITY_COLORS} from '../../utils/priority';
 
@@ -10,7 +10,7 @@ interface PriorityIndicatorProps {
   compact?: boolean;
 }
 
-const ICONS: Record<PriorityLevel, string> = {
+const ICONS: Record<PriorityLevel, MaterialIconsIconName> = {
   urgent: 'priority-high',
   high: 'arrow-upward',
   normal: 'remove',
