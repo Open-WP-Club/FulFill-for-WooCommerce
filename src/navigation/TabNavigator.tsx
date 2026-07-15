@@ -1,6 +1,6 @@
 import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icon from '@react-native-vector-icons/material-icons';
 import {OrdersStackNavigator} from './OrdersStackNavigator';
 import {ScannerScreen} from '../screens/scanner/ScannerScreen';
 import {AnalyticsDashboardScreen} from '../screens/analytics/AnalyticsDashboardScreen';

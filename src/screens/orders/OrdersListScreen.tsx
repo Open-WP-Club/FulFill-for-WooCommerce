@@ -1,6 +1,6 @@
 import React, {useEffect, useCallback, useState, useRef, useMemo} from 'react';
 import {View, FlatList, StyleSheet, TextInput, Alert, TouchableOpacity, Text} from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icon from '@react-native-vector-icons/material-icons';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {OrderCard} from '../../components/orders/OrderCard';
 import {FilterBar} from '../../components/orders/FilterBar';

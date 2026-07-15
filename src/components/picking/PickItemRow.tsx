@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {View, Text, Image, StyleSheet, TouchableOpacity} from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icon from '@react-native-vector-icons/material-icons';
 import {StockIndicator} from './StockIndicator';
 import {useProductStock} from '../../hooks/useProductStock';
 import {useTheme} from '../../theme/ThemeContext';

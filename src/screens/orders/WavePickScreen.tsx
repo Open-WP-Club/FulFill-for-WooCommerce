@@ -8,7 +8,7 @@ import {
   Image,
   Alert,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icon from '@react-native-vector-icons/material-icons';
 import type {NativeStackScreenProps} from '@react-navigation/native-stack';
 import {Card} from '../../components/common/Card';
 import {Button} from '../../components/common/Button';

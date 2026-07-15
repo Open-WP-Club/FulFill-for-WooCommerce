@@ -1,6 +1,6 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icon from '@react-native-vector-icons/material-icons';
 import type {PriorityLevel} from '../../utils/priority';
 import {PRIORITY_COLORS} from '../../utils/priority';
 

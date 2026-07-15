@@ -7,7 +7,7 @@ import {
   FlatList,
   Pressable,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icon from '@react-native-vector-icons/material-icons';
 import {CameraView} from '../../components/scanner/CameraView';
 import {ScanGuide} from '../../components/scanner/ScanGuide';
 import {Card} from '../../components/common/Card';

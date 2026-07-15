@@ -4,7 +4,7 @@ import Animated, {interpolate, useAnimatedStyle} from 'react-native-reanimated';
 import type {SharedValue} from 'react-native-reanimated';
 import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 import type {SwipeableMethods} from 'react-native-gesture-handler/ReanimatedSwipeable';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icon from '@react-native-vector-icons/material-icons';
 import {Card} from '../common/Card';
 import {StatusBadge} from './StatusBadge';
 import {formatCurrency, formatDate, formatCustomerName} from '../../utils/formatters';
